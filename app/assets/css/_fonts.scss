@@ -1,0 +1,33 @@
+@use "./variables" as *;
+
+@font-face {
+  font-family: $font-inter;
+  src: url("/fonts/inter-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: $font-lato;
+  src: url("/fonts/lato-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: $font-audiowide;
+  src: url("/fonts/audiowide-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: $font-stalinist-one;
+  src: url("/fonts/stalinistone-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

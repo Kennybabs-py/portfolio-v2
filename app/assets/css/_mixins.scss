@@ -1,0 +1,68 @@
+@use "sass:map";
+
+@mixin border($color: white, $width: 1px) {
+  border: $width solid $color;
+}
+
+@mixin flex($align: center, $justify: center, $flow: row) {
+  display: flex;
+  align-items: $align;
+  justify-content: $justify;
+  flex-flow: $flow;
+}
+
+@mixin grid {
+  display: grid;
+  place-items: center;
+}
+
+@mixin grid-template-columns($fill: auto-fill, $min: 100px, $max: 1fr) {
+  display: grid;
+  grid-template-columns: repeat($fill, minmax($min, $max));
+}
+
+@mixin font-clamp($min: 1rem, $relative: 2.5vw, $max: 24px) {
+  font-size: clamp($min, $relative, $max);
+}
+
+@mixin absoluteCenter() {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+$breakpoints: (
+  "sm-mobile": 325px,
+  "mobile": 425px,
+  "sm-tablet": 600px,
+  "tablet": 768px,
+  "sm-desktop": 1024px,
+  "desktop": 1280px,
+  "lg-desktop": 1366px,
+  "xl-desktop": 1512px,
+  "2xl": 1536,
+  "3xl": 1920,
+  "4xl": 2304,
+  "5xl": 2560,
+) !default;
+
+@mixin mediaMax($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (max-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "#{$breakpoint} not found!. #{$breakpoint} must be included in object. " + " See available: #{map-keys($breakpoints)}";
+  }
+}
+
+@mixin mediaMin($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "#{$breakpoint} not found!. #{$breakpoint} must be included in object. " + " See available: #{map-keys($breakpoints)}";
+  }
+}

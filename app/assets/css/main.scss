@@ -1,0 +1,146 @@
+@use "@/assets/css/index" as *;
+@import "lenis/dist/lenis.css";
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/lato-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Stalinist-One";
+  src: url("/fonts/stalinistone-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Anton";
+  src: url("/fonts/anton-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lavishly-Yours";
+  src: url("/fonts/lavishlyyours-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Matemasie";
+  src: url("/fonts/matemasie-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("/fonts/nunito-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --header-height: 65px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overscroll-behavior: contain;
+}
+
+body {
+  overflow-x: hidden;
+  font-family: "Lato";
+  background-color: $color-black;
+  background-color: #030201;
+  color: $color-white;
+  padding-top: calc(var(--header-height) + 30px);
+}
+
+img {
+  display: inline-block;
+}
+
+button {
+  width: max-content;
+  outline: none;
+  border: none;
+  background-color: inherit;
+}
+
+/**
+Disbaling the default transition
+*/
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+}
+
+/**
+Adjusting the z-index of the transition container
+to control the stacking order properly.
+
+This pseudo element is the wrapper for both old and new views.
+This allows the stack of old and new views to be layered independently
+*/
+::view-transition-group(root) {
+  z-index: auto !important;
+}
+
+/**
+Adjusting the isolate property to create a
+new stacking context, ensuring the old and new view
+do not interfere with each other.
+
+The z-index of 1 is to place it behind the actual transition element
+*/
+::view-transition-image-pair(root) {
+  isolation: isolate;
+  will-change: transform, opacity, clip-path;
+  z-index: 1;
+}
+
+/**
+New stacking order for both old and new views
+*/
+::view-transition-new(root) {
+  z-index: 1000;
+  animation: none !important;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+  animation: none !important;
+}
+
+.transition--block {
+  flex: 1;
+  height: 100%;
+  background-color: #030201;
+  background-color: white;
+  transform: scaleX(0);
+  transform-origin: left;
+}

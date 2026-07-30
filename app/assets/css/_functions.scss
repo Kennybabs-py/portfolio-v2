@@ -1,0 +1,17 @@
+$z-indexes: (
+  "navigation",
+  "content",
+  "level-one",
+  "level-two",
+  "level-three",
+  "level-four"
+);
+
+@function z($name) {
+  @if index($z-indexes, $name) {
+    @return (length($z-indexes) - index($z-indexes, $name)) + 1;
+  } @else {
+    @warn 'There is no "#{$name}" in this list; Choose out of "#{z-indexes}"';
+    @return null;
+  }
+}
