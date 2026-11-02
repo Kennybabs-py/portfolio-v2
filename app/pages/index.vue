@@ -1,57 +1,73 @@
 <script lang="ts" setup>
-import { gsap, SplitText } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
+import { revealText, scrollReveals } from "@/lib/reveal";
+import { prefersReducedMotion } from "@/lib/motion";
+import ProjectList from "~/components/ProjectList.vue";
+import SiteFooter from "~/components/SiteFooter.vue";
 
 const containerRef = ref<HTMLElement | null>(null);
 
 usePageEnter(() => {
-  const hiText = SplitText.create(".hi--text", { type: "words", mask: "words" });
-  const roleText = SplitText.create(".role--text h2", {
-    type: "chars",
-    mask: "chars",
-  });
-  const introText = SplitText.create(".intro--text", {
-    type: "lines",
-    mask: "lines",
-  });
-  const subtleText = SplitText.create(".the--subtle--text", {
-    type: "words",
-    mask: "words",
-  });
-
-  gsap.set("[data-reveal]", { autoAlpha: 1 });
-
   gsap
-    .timeline({ defaults: { duration: 1.2, ease: "expo-out" } })
-    .from(roleText.chars, { yPercent: 110, stagger: 0.035 }, 0)
-    .from(hiText.words, { yPercent: 110, stagger: 0.075 }, 0.2)
-    .from(".build--text", { autoAlpha: 0, y: 12 }, 0.4)
-    .from(introText.lines, { yPercent: 110, stagger: 0.08 }, 0.5)
-    .from(subtleText.words, { yPercent: 110, stagger: 0.04 }, 0.7);
+    .timeline()
+    .add(revealText(".role--text h1", "chars"), 0)
+    .add(revealText(".hi--text", "words"), 0.2)
+    .add(revealText(".build--text", "words"), 0.4)
+    .add(revealText(".intro--text", "lines"), 0.5)
+    .add(revealText(".the--subtle--text", "words"), 0.7);
+
+  scrollReveals(containerRef.value);
+
+  if (prefersReducedMotion()) return;
+
+  // the role line drifts and fades as the hero scrolls away
+  gsap.to(".role--text", {
+    yPercent: 40,
+    autoAlpha: 0.2,
+    ease: "none",
+    scrollTrigger: {
+      trigger: ".hero__wrapper",
+      start: "top top",
+      end: "bottom top",
+      scrub: true,
+    },
+  });
 }, containerRef);
 </script>
 
 <template>
   <section class="home__wrapper" ref="containerRef">
     <div class="hero__wrapper">
-      <p class="hi--text" data-reveal>hi, i, kehinde.</p>
+      <p class="hi--text" data-reveal>hi, i'm kehinde.</p>
 
       <h3 class="build--text" data-reveal>build, iterate, build, repeat</h3>
 
       <div class="role--text">
-        <h2 data-reveal>a frontend engineer</h2>
+        <h1 data-reveal>a software engineer</h1>
       </div>
 
       <p class="intro--text" data-reveal>
         who resides in lagos, ng. i use
-        <NuxtLink to="#tools">tools</NuxtLink> to craft web applications and
-        sites for individuals, studios, and companies. i enjoy playing snooker,
-        fifa and taking long walks in order to meet my luck.
+        <NuxtLink to="/info#tools">tools</NuxtLink> to craft web applications
+        and sites for individuals, studios, and companies. i enjoy playing
+        snooker, fifa and taking long walks in order to meet my luck.
       </p>
 
       <h2 class="the--subtle--text" data-reveal>
         the subtle art of balancing thoughts and function
       </h2>
     </div>
+
+    <div class="work__wrapper">
+      <div class="work__header">
+        <h2 data-scroll-reveal="chars">selected work</h2>
+        <NuxtLink to="/projects" data-cursor="all work">see all</NuxtLink>
+      </div>
+
+      <ProjectList />
+    </div>
+
+    <SiteFooter />
   </section>
 </template>
 
@@ -62,80 +78,100 @@ section.home__wrapper {
   position: relative;
   width: 100%;
   min-height: 100svh;
-  background-color: #030201;
-
-  // hidden until the intro timeline runs, avoids a flash of unsplit text
-  [data-reveal] {
-    visibility: hidden;
-  }
+  background-color: var(--color-ink);
+  color: var(--color-paper);
 
   .hero__wrapper {
     position: relative;
     width: 100%;
     height: 100svh;
     overflow: hidden;
-    padding: calc(var(--header-height) + 1rem) 1rem 1rem;
+    padding: calc(var(--header-height) + 1rem) var(--gutter) var(--gutter);
 
     .hi--text {
-      letter-spacing: -0.01rem;
-      font-weight: 300;
-      text-align: left;
-      font-size: clamp(1.5rem, 3vw, 2.5rem);
-      font-family: "Lavishly-Yours";
+      font-family: var(--font-script);
+      font-size: var(--step-3);
+      line-height: 1;
     }
 
     .role--text {
       @include flex(center, center, row);
-      gap: 1rem;
       width: 100%;
       position: absolute;
       inset: 0;
+      padding-inline: var(--gutter);
       pointer-events: none;
 
-      & > h2 {
-        letter-spacing: -0.01rem;
+      & > h1 {
         text-transform: uppercase;
-        font-weight: 800;
         text-align: center;
-        font-size: clamp(10vmin, 10vw, 20vmin);
-        font-family: "Anton";
-        line-height: 1;
+        // wraps to two lines on phones instead of shrinking
+        font-size: clamp(3.25rem, 10vw, 20vmin);
+        font-family: var(--font-display);
+        line-height: 0.95;
       }
     }
 
     .intro--text {
       position: absolute;
-      bottom: 12%;
-      width: min(90%, 700px);
+      bottom: 14%;
+      width: min(calc(100% - 2 * var(--gutter)), 700px);
       left: 50%;
-      transform: translateX(-50%);
+      translate: -50% 0;
       text-align: center;
       text-transform: uppercase;
-      font-size: clamp(0.8rem, 2vw, 1rem);
+      font-size: var(--step--1);
       line-height: 1.8;
 
       & a {
         @extend %link;
+        color: inherit;
       }
     }
 
     .the--subtle--text {
       position: absolute;
-      bottom: 1rem;
-      inset-inline: 1rem;
-      letter-spacing: -0.01rem;
+      bottom: var(--gutter);
+      inset-inline: var(--gutter);
       font-weight: 400;
-      font-size: clamp(1.5rem, 3vw, 2.75rem);
-      font-family: "Mea Culpa";
-      line-height: 1.2;
+      font-size: var(--step-3);
+      font-family: var(--font-script);
+      line-height: 1.1;
     }
 
     .build--text {
       position: absolute;
-      right: 1rem;
+      right: var(--gutter);
       top: calc(var(--header-height) + 1rem);
-      font-family: "Matemasie";
-      font-size: clamp(0.8rem, 2vw, 1rem);
+      font-size: var(--step--1);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+
+      @include mediaMax("sm-tablet") {
+        position: static;
+        margin-top: 0.75rem;
+      }
+    }
+  }
+
+  .work__wrapper {
+    padding: clamp(6rem, 15vh, 10rem) var(--gutter) 0;
+  }
+
+  .work__header {
+    @include flex(baseline, space-between, row);
+    padding-bottom: 1.5rem;
+
+    h2 {
+      font-family: var(--font-script);
+      font-size: var(--step-3);
+      line-height: 1;
+    }
+
+    a {
+      @extend %link;
+      color: inherit;
+      font-size: var(--step--1);
     }
   }
 }

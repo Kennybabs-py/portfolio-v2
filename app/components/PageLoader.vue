@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { gsap } from "@/lib/gsap";
+import { durations, eases, exitCurve, prefersReducedMotion } from "@/lib/motion";
 import { ref, onMounted } from "vue";
 
 const emit = defineEmits<{
@@ -23,9 +24,7 @@ watch(progress, (value) => {
 
 onMounted(() => {
   const obj = { value: 0 };
-  const reduceMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
+  const reduceMotion = prefersReducedMotion();
 
   gsap.to(obj, {
     value: 100,
@@ -72,8 +71,8 @@ onMounted(() => {
           loaderRef.value,
           {
             yPercent: -100,
-            duration: 1.4,
-            ease: "expo-in-out",
+            duration: durations.page,
+            ease: eases.inOut,
           },
           "lift",
         )
@@ -84,8 +83,8 @@ onMounted(() => {
             borderBottomRightRadius: "50% 0vh",
           },
           {
-            borderBottomLeftRadius: "50% 22vh",
-            borderBottomRightRadius: "50% 22vh",
+            borderBottomLeftRadius: `50% ${exitCurve}`,
+            borderBottomRightRadius: `50% ${exitCurve}`,
             duration: 0.8,
             ease: "power2.in",
           },
@@ -100,7 +99,7 @@ onMounted(() => {
 <template>
   <div
     ref="loaderRef"
-    class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-white text-black overflow-hidden"
+    class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[var(--color-paper)] text-[var(--color-ink)] overflow-hidden"
   >
     <div class="percentage" ref="percentRef">
       <div v-for="(digit, i) in digits" :key="i" class="digit-wrapper">
@@ -128,11 +127,10 @@ onMounted(() => {
 .percentage {
   display: inline-flex;
   font-variant-numeric: tabular-nums;
-  font-family: "Matemasie";
-  font-weight: 800;
+  font-family: var(--font-display);
   font-size: clamp(3rem, 7vw, 10rem);
   line-height: 1;
-  letter-spacing: 0.4rem;
+  letter-spacing: 0.02em;
 }
 
 .digit-wrapper {
@@ -166,7 +164,7 @@ onMounted(() => {
   .bar {
     width: 100%;
     height: 100%;
-    background-color: black;
+    background-color: var(--color-ink);
     transform-origin: left;
     transform: scaleX(0);
     will-change: transform;

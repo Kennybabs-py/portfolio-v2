@@ -1,38 +1,31 @@
 <script lang="ts" setup>
 import Clock from "../Clock.vue";
+import { site } from "@/data/site";
 </script>
 
 <template>
   <header class="header__wrapper">
-    <nav class="nav">
+    <nav class="nav" aria-label="main">
       <div class="nav-col">
         <div class="nav-items name">
-          <NuxtLink to="/">kehinde</NuxtLink>
+          <NuxtLink to="/">{{ site.name }}</NuxtLink>
         </div>
 
-        <div class="nav-items">
-          <span>dev. studio</span>
+        <div class="nav-items hide-sm">
+          <span>{{ site.role }}</span>
         </div>
       </div>
 
       <div class="nav-col">
-        <div class="nav-items">
+        <div class="nav-items links">
           <NuxtLink to="/projects">projects</NuxtLink>
-          <!-- <NuxtLink to="/info">info</NuxtLink> -->
+          <NuxtLink to="/info">info</NuxtLink>
         </div>
 
-        <!-- <div class="nav-items">
-            <Link href="">twitter</Link>
-            <Link href="">instagram</Link>
-          </div> -->
-
-        <div class="nav-items">
-          <span>lagos, ng</span>
-        </div>
-
-        <!-- <div class="nav-items">
+        <div class="nav-items location">
+          <span class="hide-sm">{{ site.location }}</span>
           <Clock />
-        </div> -->
+        </div>
       </div>
     </nav>
   </header>
@@ -49,18 +42,22 @@ header.header__wrapper {
   z-index: 10;
   min-height: var(--header-height);
   color: $color-white;
+  font-size: var(--step--1);
+  text-transform: lowercase;
   // blends against whatever page is underneath, including mid-transition
   mix-blend-mode: difference;
 
   nav.nav {
     @include flex(flex-start, space-between, row);
+    gap: 1rem;
     width: 100%;
-    padding: 1rem;
+    padding: 1rem var(--gutter);
   }
 
   .nav-col {
     flex: 1;
     display: flex;
+    gap: 1rem;
   }
 
   .nav-items {
@@ -68,10 +65,10 @@ header.header__wrapper {
 
     display: flex;
     flex-direction: column;
+    gap: 0.15rem;
 
     & > * {
       color: inherit;
-      font-weight: 200;
     }
 
     & > a {
@@ -79,13 +76,31 @@ header.header__wrapper {
       width: fit-content;
     }
 
+    & > a.router-link-active::after {
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+
     &.name {
-      font-family: "Matemasie";
+      font-family: var(--font-display);
+      font-size: var(--step-1);
+      text-transform: uppercase;
+      line-height: 1;
     }
   }
 
-  .nav-col:nth-child(2) .nav-items:last-child {
+  .nav-items.location {
     align-items: flex-end;
+  }
+
+  @include mediaMax("sm-tablet") {
+    .hide-sm {
+      display: none;
+    }
+
+    .nav-col:first-child {
+      flex: 0 0 auto;
+    }
   }
 }
 </style>

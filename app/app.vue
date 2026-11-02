@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { durations, eases, exitCurve, prefersReducedMotion } from "@/lib/motion";
 import PageLoader from "./components/PageLoader.vue";
+import Cursor from "./components/Cursor.vue";
 import type { LenisOptions } from "lenis";
 
 // lenis is driven by gsap's ticker so ScrollTrigger and smooth scroll share a frame
@@ -12,7 +14,7 @@ const pageReady = usePageReady();
 const transitioning = usePageTransitioning();
 const shadeRef = ref<HTMLElement | null>(null);
 
-const DURATION = 1.3;
+const DURATION = durations.page;
 // how far into the transition the new page starts its intro
 const READY_AT = 0.75;
 
@@ -29,6 +31,23 @@ onBeforeUnmount(() => gsap.ticker.remove(update));
 
 watch(lenis, (instance) => instance?.on("scroll", ScrollTrigger.update));
 
+useHead({
+  htmlAttrs: { lang: "en" },
+  titleTemplate: (title) => (title ? `${title} — kehinde` : "kehinde — software engineer"),
+  link: [
+    { rel: "preload", href: "/fonts/anton-regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
+    { rel: "preload", href: "/fonts/lato-regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
+  ],
+});
+
+useSeoMeta({
+  description:
+    "kehinde, a software engineer in lagos crafting web applications and sites for individuals, studios and companies.",
+  ogType: "website",
+  ogSiteName: "kehinde",
+  twitterCard: "summary_large_image",
+});
+
 // without a loader on screen, the first page can run its intro right away
 if (!isLoading.value) pageReady.value = true;
 
@@ -39,10 +58,6 @@ router.beforeEach((to, from) => {
   // don't stack transitions or navigate under the loader
   if (transitioning.value || isLoading.value) return false;
 });
-
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 const onLeave = (el: Element, done: () => void) => {
   const page = el as HTMLElement;
@@ -78,7 +93,7 @@ const onLeave = (el: Element, done: () => void) => {
     .timeline({ onComplete: done })
     .to(
       page,
-      { y: -window.innerHeight, duration: DURATION, ease: "expo-in-out" },
+      { y: -window.innerHeight, duration: DURATION, ease: eases.inOut },
       0,
     )
     .fromTo(
@@ -88,8 +103,8 @@ const onLeave = (el: Element, done: () => void) => {
         borderBottomRightRadius: "50% 0vh",
       },
       {
-        borderBottomLeftRadius: "50% 22vh",
-        borderBottomRightRadius: "50% 22vh",
+        borderBottomLeftRadius: `50% ${exitCurve}`,
+        borderBottomRightRadius: `50% ${exitCurve}`,
         duration: DURATION * 0.6,
         ease: "power2.in",
       },
@@ -98,7 +113,7 @@ const onLeave = (el: Element, done: () => void) => {
     .fromTo(
       shadeRef.value,
       { autoAlpha: 0.7 },
-      { autoAlpha: 0, duration: DURATION, ease: "expo-in-out" },
+      { autoAlpha: 0, duration: DURATION, ease: eases.inOut },
       0,
     );
 };
@@ -122,7 +137,7 @@ const onEnter = (el: Element, done: () => void) => {
     .fromTo(
       el,
       { y: "25vh" },
-      { y: 0, duration: DURATION, ease: "expo-in-out", clearProps: "transform" },
+      { y: 0, duration: DURATION, ease: eases.inOut, clearProps: "transform" },
       0,
     )
     .call(() => (pageReady.value = true), [], DURATION * READY_AT);
@@ -152,6 +167,8 @@ function onLoaderReveal() {
       }"
     />
   </NuxtLayout>
+
+  <Cursor />
 
   <!-- darkens the incoming page while the old one lifts off it -->
   <div ref="shadeRef" class="page__shade" />
