@@ -95,7 +95,13 @@ useSeoMeta({
 
     <figure class="case__cover" :style="{ backgroundColor: project.color }">
       <div class="case__cover__inner">
-        <img v-if="project.image" :src="project.image" :alt="project.title" />
+        <NuxtImg
+          v-if="project.image"
+          :src="project.image"
+          :alt="project.title"
+          sizes="100vw"
+          preload
+        />
         <span v-else>{{ project.title }}</span>
       </div>
     </figure>
@@ -190,9 +196,7 @@ useSeoMeta({
     padding: clamp(5rem, 12vh, 8rem) var(--gutter);
 
     h2 {
-      font-family: var(--font-script);
-      font-size: var(--step-3);
-      line-height: 1;
+      @extend %label;
     }
 
     p {

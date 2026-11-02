@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import type { NuxtError } from "#app";
+import { site } from "@/data/site";
 
 const props = defineProps<{ error: NuxtError }>();
 
 const is404 = computed(() => props.error.statusCode === 404);
 
-useHead({ title: is404.value ? "not found — kehinde" : "error — kehinde" });
+useHead({ title: `${is404.value ? "not found" : "error"} — ${site.name}` });
 
 function goHome() {
   clearError({ redirect: "/" });
@@ -44,9 +45,8 @@ function goHome() {
   }
 
   p {
-    font-family: var(--font-script);
-    font-size: var(--step-3);
-    line-height: 1.1;
+    font-size: var(--step-1);
+    max-width: 30ch;
   }
 
   button {

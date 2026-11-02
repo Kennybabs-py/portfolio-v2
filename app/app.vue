@@ -3,6 +3,7 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { durations, eases, exitCurve, prefersReducedMotion } from "@/lib/motion";
 import PageLoader from "./components/PageLoader.vue";
 import Cursor from "./components/Cursor.vue";
+import { site } from "@/data/site";
 import type { LenisOptions } from "lenis";
 
 // lenis is driven by gsap's ticker so ScrollTrigger and smooth scroll share a frame
@@ -33,7 +34,16 @@ watch(lenis, (instance) => instance?.on("scroll", ScrollTrigger.update));
 
 useHead({
   htmlAttrs: { lang: "en" },
-  titleTemplate: (title) => (title ? `${title} — kehinde` : "kehinde — software engineer"),
+  titleTemplate: (title) =>
+    title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`,
+  script: [
+    // before first paint: returning visitors in this session skip the loader
+    {
+      innerHTML:
+        "try{sessionStorage.getItem('loader-seen')&&document.documentElement.classList.add('loader-seen')}catch(e){}",
+      tagPosition: "head",
+    },
+  ],
   link: [
     { rel: "preload", href: "/fonts/anton-regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
     { rel: "preload", href: "/fonts/lato-regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
@@ -41,10 +51,9 @@ useHead({
 });
 
 useSeoMeta({
-  description:
-    "kehinde, a software engineer in lagos crafting web applications and sites for individuals, studios and companies.",
+  description: site.description,
   ogType: "website",
-  ogSiteName: "kehinde",
+  ogSiteName: site.name,
   twitterCard: "summary_large_image",
 });
 
@@ -53,11 +62,23 @@ if (!isLoading.value) pageReady.value = true;
 
 const router = useRouter();
 
+// a click mid-transition (or under the loader) is held and replayed after,
+// instead of being dropped
+let pendingPath: string | null = null;
+
 router.beforeEach((to, from) => {
   if (to.path === from.path) return;
-  // don't stack transitions or navigate under the loader
-  if (transitioning.value || isLoading.value) return false;
+  if (transitioning.value || isLoading.value) {
+    pendingPath = to.fullPath;
+    return false;
+  }
 });
+
+function flushPendingNavigation() {
+  const path = pendingPath;
+  pendingPath = null;
+  if (path && path !== router.currentRoute.value.fullPath) router.push(path);
+}
 
 const onLeave = (el: Element, done: () => void) => {
   const page = el as HTMLElement;
@@ -80,7 +101,8 @@ const onLeave = (el: Element, done: () => void) => {
     zIndex: 5, // above the shade (4), below the header (10)
   });
 
-  // the new page renders underneath from the top
+  // the new page renders underneath; router.options.ts then restores its
+  // saved scroll position (back/forward) or scrolls to the hash
   window.scrollTo(0, 0);
   lenis.value?.scrollTo(0, { immediate: true, force: true });
 
@@ -120,10 +142,14 @@ const onLeave = (el: Element, done: () => void) => {
 
 const onEnter = (el: Element, done: () => void) => {
   const finish = () => {
+    // router.options.ts may have restored a saved position natively;
+    // bring lenis' own target in line so the next wheel tick starts from there
+    lenis.value?.scrollTo(window.scrollY, { immediate: true, force: true });
     lenis.value?.start();
     ScrollTrigger.refresh();
     transitioning.value = false;
     done();
+    flushPendingNavigation();
   };
 
   if (prefersReducedMotion()) {
@@ -146,13 +172,18 @@ const onEnter = (el: Element, done: () => void) => {
 function onLoaderReveal() {
   pageReady.value = true;
 }
+
+function onLoaderComplete() {
+  finishLoader();
+  flushPendingNavigation();
+}
 </script>
 
 <template>
   <PageLoader
     v-if="isLoading"
     @reveal="onLoaderReveal"
-    @complete="finishLoader"
+    @complete="onLoaderComplete"
   />
 
   <VueLenis root :options="lenisOptions" />

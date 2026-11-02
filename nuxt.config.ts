@@ -4,26 +4,18 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["@/assets/css/main.scss"],
-  modules: ["lenis/nuxt", "@nuxtjs/tailwindcss", "shadcn-nuxt"],
+  modules: ["lenis/nuxt", "@nuxt/image"],
+
+  // project images go in public/projects/, served as modern formats at the
+  // sizes each <NuxtImg> asks for
+  image: {
+    format: ["avif", "webp"],
+    quality: 80,
+  },
 
   vite: {
     optimizeDeps: {
       include: ["gsap", "gsap/CustomEase", "gsap/ScrollTrigger", "gsap/SplitText"],
     },
-  },
-
-  shadcn: {
-    /**
-     * Prefix for all the imported component.
-     * @default "Ui"
-     */
-    prefix: "",
-    /**
-     * Directory that the component lives in.
-     * Will respect the Nuxt aliases.
-     * @link https://nuxt.com/docs/api/nuxt-config#alias
-     * @default "@/components/ui"
-     */
-    componentDir: "@/components/ui",
   },
 });

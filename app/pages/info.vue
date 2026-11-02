@@ -27,9 +27,7 @@ useSeoMeta({
       <h1 class="info--title" data-reveal>info</h1>
 
       <p class="info--statement" data-reveal>
-        i'm {{ site.name }}, a {{ site.role }} in {{ site.location }}. i craft
-        web applications and sites for individuals, studios, and companies,
-        balancing thought and function, and sweating the motion in between.
+        {{ site.info.statement }}
       </p>
     </header>
 
@@ -98,9 +96,7 @@ useSeoMeta({
     padding-inline: 0;
 
     h2 {
-      font-family: var(--font-script);
-      font-size: var(--step-3);
-      line-height: 1;
+      @extend %label;
     }
 
     ul {

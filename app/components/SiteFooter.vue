@@ -13,10 +13,10 @@ function backToTop() {
 
 <template>
   <footer class="site__footer">
-    <p class="eyebrow" data-scroll-reveal="words">got an idea worth building?</p>
+    <p class="eyebrow" data-scroll-reveal="words">{{ site.footer.eyebrow }}</p>
 
     <NuxtLink :to="contactHref" class="cta" data-magnetic data-cursor="say hi">
-      <span data-scroll-reveal="chars">let's talk</span>
+      <span data-scroll-reveal="chars">{{ site.footer.cta }}</span>
     </NuxtLink>
 
     <div class="footer__bottom">
@@ -43,9 +43,7 @@ function backToTop() {
   padding: clamp(6rem, 15vh, 10rem) var(--gutter) var(--gutter);
 
   .eyebrow {
-    font-family: var(--font-script);
-    font-size: var(--step-3);
-    line-height: 1;
+    @extend %label;
   }
 
   .cta {

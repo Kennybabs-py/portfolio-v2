@@ -62,6 +62,20 @@ function onLeave() {
         @pointerenter="onEnter(index)"
       >
         <NuxtLink :to="`/projects/${project.slug}`" data-cursor="view">
+          <!-- touch screens can't hover, so they get the cover inline -->
+          <span
+            class="thumb"
+            :style="{ backgroundColor: project.color }"
+            aria-hidden="true"
+          >
+            <NuxtImg
+              v-if="project.image"
+              :src="project.image"
+              alt=""
+              sizes="100vw"
+              loading="lazy"
+            />
+          </span>
           <span class="index">{{ String(index + 1).padStart(2, "0") }}</span>
           <span class="title" data-scroll-reveal="chars">{{ project.title }}</span>
           <span class="role">{{ project.role }}</span>
@@ -78,7 +92,13 @@ function onLeave() {
         :class="{ 'is-current': hovered === index }"
         :style="{ backgroundColor: project.color }"
       >
-        <img v-if="project.image" :src="project.image" alt="" />
+        <NuxtImg
+          v-if="project.image"
+          :src="project.image"
+          alt=""
+          sizes="320px"
+          loading="lazy"
+        />
         <span v-else>{{ project.title }}</span>
       </div>
     </div>
@@ -133,6 +153,26 @@ function onLeave() {
 
   li.is-hovered .title {
     translate: 1rem 0;
+  }
+
+  .thumb {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .thumb {
+      display: block;
+      grid-column: 1 / -1;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      border-radius: 0.5rem;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
   }
 
   @include mediaMax("sm-tablet") {

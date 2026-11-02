@@ -12,7 +12,7 @@ import { site } from "@/data/site";
         </div>
 
         <div class="nav-items hide-sm">
-          <span>{{ site.role }}</span>
+          <span>{{ site.tagline }}</span>
         </div>
       </div>
 
@@ -23,8 +23,8 @@ import { site } from "@/data/site";
         </div>
 
         <div class="nav-items location">
-          <span class="hide-sm">{{ site.location }}</span>
-          <Clock />
+          <span>{{ site.location }}</span>
+          <Clock class="hide-sm" />
         </div>
       </div>
     </nav>
@@ -94,8 +94,16 @@ header.header__wrapper {
   }
 
   @include mediaMax("sm-tablet") {
+    font-size: var(--step-0);
+
     .hide-sm {
       display: none;
+    }
+
+    // links side by side, so they read as navigation, not a list
+    .nav-items.links {
+      flex-direction: row;
+      gap: 1rem;
     }
 
     .nav-col:first-child {

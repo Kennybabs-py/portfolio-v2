@@ -19,6 +19,8 @@ onMounted(() => {
   if (!finePointer.matches || prefersReducedMotion()) return;
 
   const cursor = cursorRef.value!;
+  // the ring replaces the system pointer, so there's only ever one cursor
+  document.documentElement.classList.add("has-custom-cursor");
   const xTo = gsap.quickTo(cursor, "x", { duration: 0.5, ease: "power3" });
   const yTo = gsap.quickTo(cursor, "y", { duration: 0.5, ease: "power3" });
 
@@ -62,6 +64,7 @@ onMounted(() => {
   document.documentElement.addEventListener("pointerleave", onLeave);
 
   cleanup = () => {
+    document.documentElement.classList.remove("has-custom-cursor");
     window.removeEventListener("pointermove", onMove);
     document.documentElement.removeEventListener("pointerleave", onLeave);
   };
@@ -88,6 +91,7 @@ onBeforeUnmount(() => cleanup?.());
     aria-hidden="true"
   >
     <span class="cursor__ring" />
+    <span class="cursor__dot" />
     <span class="cursor__label">{{ label }}</span>
   </div>
 </template>
@@ -118,12 +122,22 @@ onBeforeUnmount(() => cleanup?.());
     scale: 0.4;
   }
 
+  .cursor__dot {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: currentColor;
+    transition: opacity 0.3s;
+  }
+
   .cursor__label {
     position: absolute;
     translate: -50% -50%;
     font-size: var(--step--1);
     text-transform: lowercase;
-    color: $color-ink;
+    color: $color-paper;
     opacity: 0;
     transition: opacity 0.3s;
     white-space: nowrap;
@@ -133,15 +147,31 @@ onBeforeUnmount(() => cleanup?.());
     scale: 1;
   }
 
+  // labels sit on a solid ink disc with a paper outline, outside the blend,
+  // so they stay legible over any background (including project covers)
   &.has-label {
+    mix-blend-mode: normal;
+
     .cursor__ring {
       scale: 2;
-      background-color: currentColor;
+      border-color: $color-paper;
+      background-color: $color-ink;
+    }
+
+    .cursor__dot {
+      opacity: 0;
     }
 
     .cursor__label {
       opacity: 1;
     }
   }
+}
+</style>
+
+<style>
+.has-custom-cursor,
+.has-custom-cursor * {
+  cursor: none !important;
 }
 </style>

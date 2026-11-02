@@ -39,7 +39,8 @@ export function useGSAP(callback: () => void, scope?: Ref<HTMLElement | null>) {
 
 /** like useGSAP, but runs once the page is ready, for intro animations */
 export function usePageEnter(
-  callback: () => void,
+  // may return a cleanup function, called when the page's context reverts
+  callback: () => void | (() => void),
   scope?: Ref<HTMLElement | null>,
 ) {
   const ready = usePageReady();

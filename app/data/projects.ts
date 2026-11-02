@@ -5,8 +5,9 @@ export interface Project {
   role: string;
   stack: string[];
   summary: string;
-  /** cover colour, used until there is an image */
+  /** cover colour, shown behind the image while it loads (or instead of one) */
   color: string;
+  /** path under public/, e.g. "/projects/my-site.jpg"; served via <NuxtImg> */
   image?: string;
   url?: string;
 }

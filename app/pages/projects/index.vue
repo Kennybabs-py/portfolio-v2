@@ -2,6 +2,7 @@
 import { gsap } from "@/lib/gsap";
 import { revealText, scrollReveals } from "@/lib/reveal";
 import { projects } from "@/data/projects";
+import { site } from "@/data/site";
 import ProjectList from "~/components/ProjectList.vue";
 import SiteFooter from "~/components/SiteFooter.vue";
 
@@ -18,7 +19,7 @@ usePageEnter(() => {
 
 useSeoMeta({
   title: "projects",
-  description: "selected projects by kehinde, a software engineer in lagos.",
+  description: `selected projects by ${site.name}, a ${site.role} in ${site.location}.`,
 });
 </script>
 

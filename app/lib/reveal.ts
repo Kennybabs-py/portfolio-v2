@@ -11,19 +11,26 @@ export function revealText(
   target: gsap.DOMTarget,
   kind: SplitKind = "lines",
   vars: gsap.TweenVars = {},
+  // unsplit once revealed, e.g. to hand the text to another effect
+  { revert = false } = {},
 ) {
   // chars are wrapped in words too, so lines only break between words
   const type = kind === "chars" ? "words, chars" : kind;
   const split = SplitText.create(target, { type, mask: kind });
   gsap.set(target, { autoAlpha: 1 });
 
-  if (prefersReducedMotion()) return gsap.from(split[kind], { autoAlpha: 0 });
+  const onComplete = revert ? () => split.revert() : undefined;
+
+  if (prefersReducedMotion()) {
+    return gsap.from(split[kind], { autoAlpha: 0, onComplete });
+  }
 
   return gsap.from(split[kind], {
     yPercent: 110,
     duration: durations.reveal,
     ease: eases.out,
     stagger: stagger[kind],
+    onComplete,
     ...vars,
   });
 }

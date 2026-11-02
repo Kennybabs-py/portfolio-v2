@@ -22,13 +22,81 @@ watch(progress, (value) => {
   digits.value = str.split("").map(Number);
 });
 
-onMounted(() => {
-  const obj = { value: 0 };
-  const reduceMotion = prefersReducedMotion();
+const SEEN_KEY = "loader-seen";
 
-  gsap.to(obj, {
+function playExit() {
+  gsap
+    .timeline({
+      onComplete: () => {
+        try {
+          sessionStorage.setItem(SEEN_KEY, "1");
+        } catch {}
+        emit("complete");
+      },
+    })
+    .to(
+      percentRef.value!.children,
+      {
+        yPercent: -100,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.04,
+        ease: "power3.in",
+      },
+      0,
+    )
+    .to(
+      barWrapperRef.value,
+      {
+        scaleX: 0,
+        transformOrigin: "right",
+        opacity: 0,
+        duration: 0.5,
+        ease: "power3.in",
+      },
+      0.1,
+    )
+    .addLabel("lift", 0.4)
+    .to(
+      loaderRef.value,
+      {
+        yPercent: -100,
+        duration: durations.page,
+        ease: eases.inOut,
+      },
+      "lift",
+    )
+    .fromTo(
+      loaderRef.value,
+      {
+        borderBottomLeftRadius: "50% 0vh",
+        borderBottomRightRadius: "50% 0vh",
+      },
+      {
+        borderBottomLeftRadius: `50% ${exitCurve}`,
+        borderBottomRightRadius: `50% ${exitCurve}`,
+        duration: 0.8,
+        ease: "power2.in",
+      },
+      "lift",
+    )
+    .call(() => emit("reveal"), [], "lift+=0.6");
+}
+
+onMounted(async () => {
+  // returning visitor: the loader was hidden before paint (see app.vue head)
+  if (document.documentElement.classList.contains(SEEN_KEY)) {
+    emit("reveal");
+    emit("complete");
+    return;
+  }
+
+  const obj = { value: 0 };
+
+  // the counter runs alongside font loading; the exit waits for both
+  const counter = gsap.to(obj, {
     value: 100,
-    duration: reduceMotion ? 0.6 : 2.2,
+    duration: prefersReducedMotion() ? 0.3 : 0.9,
     ease: "power2.inOut",
     onUpdate: () => {
       progress.value = Math.round(obj.value);
@@ -37,69 +105,19 @@ onMounted(() => {
         gsap.set(barRef.value, { scaleX: progress.value / 100 });
       }
     },
-    onComplete: () => {
-      const tl = gsap.timeline({
-        onComplete: () => {
-          emit("complete");
-        },
-      });
-
-      tl.to(
-        percentRef.value!.children,
-        {
-          yPercent: -100,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.05,
-          ease: "power3.in",
-        },
-        0,
-      )
-        .to(
-          barWrapperRef.value,
-          {
-            scaleX: 0,
-            transformOrigin: "right",
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.in",
-          },
-          0.3,
-        )
-        .addLabel("lift", 0.9)
-        .to(
-          loaderRef.value,
-          {
-            yPercent: -100,
-            duration: durations.page,
-            ease: eases.inOut,
-          },
-          "lift",
-        )
-        .fromTo(
-          loaderRef.value,
-          {
-            borderBottomLeftRadius: "50% 0vh",
-            borderBottomRightRadius: "50% 0vh",
-          },
-          {
-            borderBottomLeftRadius: `50% ${exitCurve}`,
-            borderBottomRightRadius: `50% ${exitCurve}`,
-            duration: 0.8,
-            ease: "power2.in",
-          },
-          "lift",
-        )
-        .call(() => emit("reveal"), [], "lift+=0.7");
-    },
   });
+
+  await Promise.all([counter, document.fonts.ready]);
+  playExit();
 });
 </script>
 
 <template>
   <div
     ref="loaderRef"
-    class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[var(--color-paper)] text-[var(--color-ink)] overflow-hidden"
+    class="page__loader"
+    role="status"
+    aria-label="loading"
   >
     <div class="percentage" ref="percentRef">
       <div v-for="(digit, i) in digits" :key="i" class="digit-wrapper">
@@ -122,6 +140,20 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @use "@/assets/css/index" as *;
+
+.page__loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+
+}
 
 // every cell is 1em tall, so the strip offset scales with the font size
 .percentage {
@@ -169,5 +201,13 @@ onMounted(() => {
     transform: scaleX(0);
     will-change: transform;
   }
+}
+</style>
+
+<style>
+/* set before first paint for returning visitors (see app.vue head);
+   unscoped, since a scoped :global() would drop the .page__loader part */
+.loader-seen .page__loader {
+  display: none;
 }
 </style>
