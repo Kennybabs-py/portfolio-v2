@@ -76,6 +76,7 @@ function onLeave() {
               densities="x1 x2"
               loading="lazy"
             />
+            <span v-else>{{ project.title }}</span>
           </span>
           <span class="index">{{ String(index + 1).padStart(2, "0") }}</span>
           <span class="title" data-scroll-reveal="chars">{{ project.title }}</span>
@@ -163,7 +164,8 @@ function onLeave() {
 
   @media (hover: none) {
     .thumb {
-      display: block;
+      display: grid;
+      place-items: center;
       grid-column: 1 / -1;
       aspect-ratio: 16 / 10;
       overflow: hidden;
@@ -174,6 +176,14 @@ function onLeave() {
         height: 100%;
         object-fit: cover;
         object-position: top center;
+      }
+
+      // projects without a screenshot show their name on the cover colour
+      span {
+        font-family: var(--font-display);
+        font-size: var(--step-3);
+        text-transform: uppercase;
+        color: $color-ink;
       }
     }
   }
