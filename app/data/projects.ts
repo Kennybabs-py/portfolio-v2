@@ -1,7 +1,8 @@
 export interface Project {
   slug: string;
   title: string;
-  year: string;
+  /** shown in the list and case study only when set */
+  year?: string;
   role: string;
   stack: string[];
   summary: string;
@@ -12,37 +13,73 @@ export interface Project {
   url?: string;
 }
 
-// TODO: placeholders, replace with real work before launch
 export const projects: Project[] = [
   {
-    slug: "project-one",
-    title: "project one",
-    year: "2026",
-    role: "design & development",
-    stack: ["nuxt", "gsap", "lenis"],
+    slug: "scholara",
+    title: "scholara",
+    role: "full-stack engineering",
+    stack: [
+      "react",
+      "vite",
+      "typescript",
+      "supabase",
+      "openrouter api",
+      "lenis",
+      "gsap",
+    ],
     summary:
-      "placeholder case study. describe the brief, what you built and the result in two or three sentences.",
-    color: "#ff4e1f",
+      "ai study tools for students: flashcards generated from your notes, a 24/7 ai tutor, adaptive quizzes, and multiple explanations of the same answer.",
+    color: "#0b2ad1",
+    image: "/projects/scholara.jpg",
+    url: "https://scholara.ng",
   },
   {
-    slug: "project-two",
-    title: "project two",
-    year: "2025",
-    role: "frontend development",
-    stack: ["vue", "typescript", "scss"],
+    slug: "stadeo",
+    title: "stadeo",
+    role: "full-stack engineering",
+    stack: [
+      "next.js",
+      "typescript",
+      "prisma",
+      "postgresql",
+      "neon",
+      "circle wallets",
+      "better-auth",
+      "redis",
+      "render",
+      "docker",
+      "vercel",
+      "claude code",
+    ],
     summary:
-      "placeholder case study. describe the brief, what you built and the result in two or three sentences.",
-    color: "#3c76f1",
+      "live football markets: back home, draw or away, then sell any time or hold to the whistle. claude code worked as my junior engineer.",
+    color: "#0c1222",
+    image: "/projects/stadeo.jpg",
+    url: "https://stadeo.app",
   },
   {
-    slug: "project-three",
-    title: "project three",
-    year: "2025",
-    role: "development",
-    stack: ["nuxt", "tailwind"],
+    slug: "sachet-pool",
+    title: "sachet pool",
+    role: "full-stack engineering",
+    stack: [
+      "next.js",
+      "typescript",
+      "prisma",
+      "postgresql",
+      "neon",
+      "better-auth",
+      "viem",
+      "wagmi",
+      "rainbowkit",
+      "cron jobs",
+      "vercel",
+      "claude code",
+    ],
     summary:
-      "placeholder case study. describe the brief, what you built and the result in two or three sentences.",
-    color: "#15c077",
+      "a pari-mutuel football pool on robinhood chain: stake $sach on a result, winners split the pot by stake, and every settlement is verifiable on-chain. claude code as my assistant.",
+    color: "#141414",
+    image: "/projects/sachet.jpg",
+    url: "https://www.sachetpool.xyz",
   },
 ];
 

@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { gsap } from "@/lib/gsap";
 import { revealText, scrollReveals } from "@/lib/reveal";
-import { site } from "@/data/site";
+import { contactLinks, site } from "@/data/site";
 import SiteFooter from "~/components/SiteFooter.vue";
+import SocialLink from "~/components/SocialLink.vue";
 
 const containerRef = ref<HTMLElement | null>(null);
 
@@ -33,25 +34,35 @@ useSeoMeta({
 
     <div id="tools" class="info__block">
       <h2 data-scroll-reveal="words">tools</h2>
-      <ul>
-        <li v-for="tool in site.tools" :key="tool" data-scroll-reveal="chars">
-          {{ tool }}
-        </li>
-      </ul>
+
+      <div class="tools">
+        <div
+          v-for="group in site.tools.groups"
+          :key="group.label"
+          class="tools__group"
+        >
+          <h3 data-scroll-reveal="words">{{ group.label }}</h3>
+          <ul>
+            <li v-for="tool in group.items" :key="tool" data-scroll-reveal="chars">
+              {{ tool }}
+            </li>
+          </ul>
+        </div>
+
+        <p v-if="site.tools.note" class="tools__note" data-scroll-reveal="words">
+          * {{ site.tools.note }}
+        </p>
+      </div>
     </div>
 
     <div id="contact" class="info__block">
       <h2 data-scroll-reveal="words">contact</h2>
 
-      <ul v-if="site.email || site.socials.length">
-        <li v-if="site.email" data-scroll-reveal="fade">
-          <a :href="`mailto:${site.email}`">{{ site.email }}</a>
-        </li>
-        <li v-for="social in site.socials" :key="social.href" data-scroll-reveal="fade">
-          <a :href="social.href" target="_blank" rel="noopener">{{ social.label }}</a>
+      <ul class="contacts" data-scroll-reveal="fade">
+        <li v-for="link in contactLinks" :key="link.href">
+          <SocialLink :platform="link.platform" :href="link.href" />
         </li>
       </ul>
-      <p v-else data-scroll-reveal>contact details coming soon.</p>
     </div>
 
     <SiteFooter />
@@ -87,6 +98,8 @@ useSeoMeta({
   }
 
   .info__block {
+    // #tools / #contact jumps land below the fixed header
+    scroll-margin-top: var(--header-height);
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 2rem;
@@ -101,19 +114,50 @@ useSeoMeta({
 
     ul {
       list-style: none;
-      font-family: var(--font-display);
-      font-size: var(--step-3);
-      line-height: 1.1;
-      text-transform: uppercase;
     }
 
-    a {
-      @extend %link--hidden;
-      color: inherit;
+    .tools {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
     }
 
-    p {
-      font-size: var(--step-1);
+    .tools__group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      h3 {
+        @extend %label;
+        color: $color-muted;
+      }
+
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.1em 0.5em;
+        font-family: var(--font-display);
+        font-size: var(--step-3);
+        line-height: 1.1;
+        text-transform: uppercase;
+      }
+
+      // slashes between items, not after the last
+      li:not(:last-child)::after {
+        content: "/";
+        margin-left: 0.5em;
+        color: $color-muted;
+      }
+    }
+
+    .tools__note {
+      @extend %label;
+      color: $color-muted;
+    }
+
+    .contacts {
+      display: flex;
+      gap: 0.75rem;
     }
 
     @include mediaMax("tablet") {

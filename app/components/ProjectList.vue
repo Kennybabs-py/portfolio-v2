@@ -72,14 +72,15 @@ function onLeave() {
               v-if="project.image"
               :src="project.image"
               alt=""
-              sizes="100vw"
+              width="800"
+              densities="x1 x2"
               loading="lazy"
             />
           </span>
           <span class="index">{{ String(index + 1).padStart(2, "0") }}</span>
           <span class="title" data-scroll-reveal="chars">{{ project.title }}</span>
           <span class="role">{{ project.role }}</span>
-          <span class="year">{{ project.year }}</span>
+          <span class="year">{{ project.year ?? "" }}</span>
         </NuxtLink>
       </li>
     </ul>
@@ -96,7 +97,8 @@ function onLeave() {
           v-if="project.image"
           :src="project.image"
           alt=""
-          sizes="320px"
+          width="420"
+          densities="x1 x2"
           loading="lazy"
         />
         <span v-else>{{ project.title }}</span>
@@ -171,6 +173,7 @@ function onLeave() {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: top center;
       }
     }
   }
@@ -191,8 +194,9 @@ function onLeave() {
   position: absolute;
   top: 0;
   left: 0;
-  width: clamp(12rem, 22vw, 20rem);
-  aspect-ratio: 4 / 5;
+  // landscape, matching the 16:10 site screenshots
+  width: clamp(16rem, 28vw, 26rem);
+  aspect-ratio: 16 / 10;
   translate: -50% -50%;
   pointer-events: none;
   overflow: hidden;
@@ -225,6 +229,7 @@ function onLeave() {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: top center;
     }
   }
 }

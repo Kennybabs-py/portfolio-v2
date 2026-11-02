@@ -46,9 +46,9 @@ usePageEnter(() => {
 
   gsap.fromTo(
     ".case__cover__inner",
-    { yPercent: -10 },
+    { yPercent: -3 },
     {
-      yPercent: 10,
+      yPercent: 3,
       ease: "none",
       scrollTrigger: {
         trigger: ".case__cover",
@@ -76,7 +76,7 @@ useSeoMeta({
           <dt>role</dt>
           <dd>{{ project.role }}</dd>
         </div>
-        <div>
+        <div v-if="project.year">
           <dt>year</dt>
           <dd>{{ project.year }}</dd>
         </div>
@@ -99,7 +99,8 @@ useSeoMeta({
           v-if="project.image"
           :src="project.image"
           :alt="project.title"
-          sizes="100vw"
+          width="1440"
+          densities="x1 x2"
           preload
         />
         <span v-else>{{ project.title }}</span>
@@ -164,13 +165,16 @@ useSeoMeta({
     }
   }
 
+  // same shape as the 16:10 site screenshots, so the whole page shows
   .case__cover {
-    height: 90svh;
+    aspect-ratio: 16 / 10;
+    max-height: 90svh;
+    width: 100%;
     overflow: hidden;
 
+    // a little taller than the frame, just enough for a gentle parallax
     .case__cover__inner {
-      height: 120%;
-      margin-top: -10%;
+      height: 108%;
       display: grid;
       place-items: center;
     }
@@ -179,6 +183,7 @@ useSeoMeta({
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: top center;
     }
 
     span {

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { site } from "@/data/site";
+import { contactLinks, site } from "@/data/site";
+import SocialLink from "~/components/SocialLink.vue";
 
 const lenis = useLenis();
 const year = new Date().getFullYear();
@@ -22,9 +23,9 @@ function backToTop() {
     <div class="footer__bottom">
       <span>© {{ year }} {{ site.name }}</span>
 
-      <ul v-if="site.socials.length" class="socials">
-        <li v-for="social in site.socials" :key="social.href">
-          <a :href="social.href" target="_blank" rel="noopener">{{ social.label }}</a>
+      <ul v-if="contactLinks.length" class="socials">
+        <li v-for="link in contactLinks" :key="link.href">
+          <SocialLink :platform="link.platform" :href="link.href" />
         </li>
       </ul>
 
@@ -73,13 +74,8 @@ function backToTop() {
 
   .socials {
     display: flex;
-    gap: 1.5rem;
+    gap: 0.75rem;
     list-style: none;
-
-    a {
-      @extend %link--hidden;
-      color: inherit;
-    }
   }
 
   button {

@@ -1,4 +1,11 @@
 // all site copy lives here, so text changes never touch page code
+export type Platform = "email" | "x" | "linkedin";
+
+export interface ContactLink {
+  platform: Platform;
+  href: string;
+}
+
 export const site = {
   name: "kehinde",
   role: "software engineer",
@@ -8,9 +15,11 @@ export const site = {
   description:
     "kehinde, a software engineer in lagos crafting web applications and sites for individuals, studios and companies.",
 
-  // TODO: fill these in; the contact block only renders what is set
-  email: "",
-  socials: [] as { label: string; href: string }[],
+  email: "babalolakehinde74@gmail.com",
+  socials: [
+    { platform: "x", href: "https://x.com/thisKehinde" },
+    { platform: "linkedin", href: "https://www.linkedin.com/in/kehinde-babalola/" },
+  ] as ContactLink[],
 
   hero: {
     greeting: "hi, i'm kehinde.",
@@ -38,5 +47,39 @@ export const site = {
     cta: "let's talk",
   },
 
-  tools: ["typescript", "vue", "nuxt", "gsap", "lenis", "scss"],
+  tools: {
+    groups: [
+      {
+        label: "ai",
+        items: ["claude code", "codex", "gemini", "aws bedrock"],
+      },
+      {
+        label: "stack",
+        items: [
+          "javascript",
+          "typescript",
+          "python",
+          "next.js",
+          "vue",
+          "nuxt",
+          "gsap",
+          "lenis",
+          "scss",
+          "prisma",
+          "postgresql",
+          "supabase",
+          "neon",
+          "redis",
+          "docker",
+        ],
+      },
+    ],
+    note: "learning java",
+  },
 };
+
+/** email first, then the socials; rendered as icon links */
+export const contactLinks: ContactLink[] = [
+  ...(site.email ? [{ platform: "email" as const, href: `mailto:${site.email}` }] : []),
+  ...site.socials,
+];
