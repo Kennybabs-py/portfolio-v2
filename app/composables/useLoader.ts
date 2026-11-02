@@ -3,8 +3,6 @@ export function useLoader() {
 
   return {
     isLoading: $loader.isLoading,
-    loaderFinished: $loader.loaderFinished,
     finishLoader: $loader.finishLoader,
-    resetLoader: $loader.resetLoader,
   };
 }

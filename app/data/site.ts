@@ -8,6 +8,10 @@ export interface ContactLink {
 
 export const site = {
   name: "kehinde",
+  // the mark: header home link, favicon, share image and page titles
+  brand: "kay",
+  // the live address: canonical links, share previews and the sitemap
+  url: "https://kennybabs.xyz",
   role: "software engineer",
   tagline: "dev. studio",
   location: "lagos, ng",
@@ -82,6 +86,12 @@ export const site = {
     note: "learning java",
   },
 };
+
+/** absolute url for a site path, without a trailing slash (except the root) */
+export function absoluteUrl(path: string) {
+  const clean = path !== "/" ? path.replace(/\/+$/, "") : "";
+  return `${site.url}${clean}`;
+}
 
 /** email first, then the socials; rendered as icon links */
 export const contactLinks: ContactLink[] = [

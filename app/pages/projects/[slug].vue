@@ -3,6 +3,7 @@ import { gsap } from "@/lib/gsap";
 import { revealText, scrollReveals } from "@/lib/reveal";
 import { prefersReducedMotion } from "@/lib/motion";
 import { findProject } from "@/data/projects";
+import { site } from "@/data/site";
 import SiteFooter from "~/components/SiteFooter.vue";
 
 const route = useRoute();
@@ -62,7 +63,9 @@ usePageEnter(() => {
 
 useSeoMeta({
   title: project.title,
+  ogTitle: `${project.title} — ${site.brand}`,
   description: project.summary,
+  ogDescription: project.summary,
 });
 </script>
 
@@ -212,10 +215,12 @@ useSeoMeta({
       @extend %label;
     }
 
+    // reading text is set in the serif, like the info statement
     p {
-      font-size: var(--step-2);
-      line-height: 1.35;
-      max-width: 32ch;
+      font-family: var(--font-serif);
+      font-size: calc(var(--step-2) * 1.3);
+      line-height: 1.15;
+      max-width: 28ch;
     }
 
     @include mediaMax("tablet") {

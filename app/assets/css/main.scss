@@ -42,7 +42,7 @@
 }
 
 :root {
-  --header-height: 65px;
+  --header-height: 92px; // fits the cursive mark and its descender
   --gutter: clamp(1rem, 2vw, 2rem);
 
   --color-ink: #{$color-ink};

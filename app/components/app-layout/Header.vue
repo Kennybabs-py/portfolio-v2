@@ -12,7 +12,7 @@ const nameLink = computed(() => nameRef.value?.querySelector("a") ?? null);
     <nav class="nav" aria-label="main">
       <div class="nav-col">
         <div ref="nameRef" class="nav-items name">
-          <NuxtLink to="/">{{ site.name }}</NuxtLink>
+          <NuxtLink to="/" :aria-label="`${site.name}, home`">{{ site.brand }}</NuxtLink>
         </div>
 
         <div class="nav-items hide-sm">
@@ -33,7 +33,8 @@ const nameLink = computed(() => nameRef.value?.querySelector("a") ?? null);
       </div>
     </nav>
 
-    <HeaderBall :anchor="nameLink" />
+    <!-- 0.313em: where the k of "kay" peaks in Mea Culpa -->
+    <HeaderBall :anchor="nameLink" :peak-x="0.313" />
   </header>
 </template>
 
@@ -82,16 +83,27 @@ header.header__wrapper {
       width: fit-content;
     }
 
-    & > a.router-link-active::after {
+    &:not(.name) > a.router-link-active::after {
       transform: scaleX(1);
       transform-origin: left center;
     }
 
+    // the cursive "kay" mark
     &.name {
-      font-family: var(--font-display);
-      font-size: var(--step-1);
-      text-transform: uppercase;
+      font-family: var(--font-script);
+      font-size: var(--step-3);
       line-height: 1;
+      // room above for the football balanced on the k
+      margin-top: 0.35rem;
+
+      // script strokes spill past the text box; no clipping, no underline
+      & > a {
+        overflow: visible;
+
+        &::after {
+          display: none;
+        }
+      }
     }
   }
 

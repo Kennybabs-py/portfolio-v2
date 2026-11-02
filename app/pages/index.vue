@@ -253,11 +253,14 @@ section.home__wrapper {
     }
   }
 
+  // reading text is set in the serif, like the info statement
   .closing--text {
-    max-width: 22ch;
+    max-width: 20ch;
     padding: clamp(6rem, 18vh, 12rem) var(--gutter) 0;
-    font-size: var(--step-4);
-    line-height: 1.05;
+    font-family: var(--font-serif);
+    font-size: calc(var(--step-4) * 1.15);
+    line-height: 1;
+    letter-spacing: -0.01em;
   }
 
   .work__wrapper {

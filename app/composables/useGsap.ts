@@ -1,4 +1,3 @@
-// composables/useGSAP.ts
 import { onMounted, onUnmounted, watch, type Ref } from "vue";
 import { gsap } from "@/lib/gsap";
 
@@ -27,17 +26,7 @@ function deferRevert(context: gsap.Context) {
   };
 }
 
-export function useGSAP(callback: () => void, scope?: Ref<HTMLElement | null>) {
-  let revert: (() => void) | undefined;
-
-  onMounted(() => {
-    revert = deferRevert(gsap.context(callback, scope?.value || undefined));
-  });
-
-  onUnmounted(() => revert?.());
-}
-
-/** like useGSAP, but runs once the page is ready, for intro animations */
+/** runs a page's GSAP intro inside a context once the page is ready */
 export function usePageEnter(
   // may return a cleanup function, called when the page's context reverts
   callback: () => void | (() => void),

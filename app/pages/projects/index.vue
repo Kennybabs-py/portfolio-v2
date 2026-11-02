@@ -19,7 +19,9 @@ usePageEnter(() => {
 
 useSeoMeta({
   title: "projects",
+  ogTitle: `projects — ${site.brand}`,
   description: `selected projects by ${site.name}, a ${site.role} in ${site.location}.`,
+  ogDescription: `selected projects by ${site.name}, a ${site.role} in ${site.location}.`,
 });
 </script>
 

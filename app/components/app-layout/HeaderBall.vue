@@ -5,7 +5,14 @@ import { prefersReducedMotion } from "@/lib/motion";
 // Easter egg: a ball balanced on the top-left corner of the name. Scrolling
 // down knocks it off; scrolling up kicks it back into the air, harder the
 // closer you are to the top; reaching the top kicks it home onto the name.
-const props = defineProps<{ anchor: HTMLElement | null }>();
+const props = defineProps<{
+  anchor: HTMLElement | null;
+  /**
+   * where the first glyph peaks, in em from the start of the text; for script
+   * letters whose top isn't at their left edge. Unset: the top-left corner.
+   */
+  peakX?: number;
+}>();
 
 const ballRef = ref<HTMLElement | null>(null);
 const squashRef = ref<HTMLElement | null>(null);
@@ -82,11 +89,15 @@ function measureRest() {
   const capTop = baseline - metrics.actualBoundingBoxAscent;
   const glyphLeft = rect.left - metrics.actualBoundingBoxLeft;
 
-  ball.r = Math.max(6, parseFloat(style.fontSize) * 0.32);
+  const fontSize = parseFloat(style.fontSize);
+  ball.r = gsap.utils.clamp(6, 9, fontSize * 0.22);
   diameter.value = ball.r * 2;
-  // hang a little past the edge, so it looks ready to roll off
-  rest.x = glyphLeft + ball.r * 0.55;
   rest.y = capTop - ball.r;
+  rest.x =
+    props.peakX !== undefined
+      ? rect.left + props.peakX * fontSize
+      : // hang a little past the edge, so it looks ready to roll off
+        glyphLeft + ball.r * 0.55;
 }
 
 function impact(speed: number) {
@@ -222,8 +233,9 @@ function stepRest(dt: number) {
   const offset = lean * ball.r * (0.28 + 0.6 * urge) + settle;
 
   ball.x = rest.x + offset;
-  // past the corner it dips, as if tipping over the edge
-  ball.y = rest.y + Math.max(0, -offset) ** 2 / (ball.r * 4);
+  // on a corner it dips past the edge; on a peak it dips either way
+  const overhang = props.peakX !== undefined ? offset : Math.min(0, offset);
+  ball.y = rest.y + overhang ** 2 / (ball.r * 4);
   ball.angle = offset / ball.r;
 }
 

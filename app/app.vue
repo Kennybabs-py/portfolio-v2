@@ -3,7 +3,7 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { durations, eases, exitCurve, prefersReducedMotion } from "@/lib/motion";
 import PageLoader from "./components/PageLoader.vue";
 import Cursor from "./components/Cursor.vue";
-import { site } from "@/data/site";
+import { absoluteUrl, site } from "@/data/site";
 import type { LenisOptions } from "lenis";
 
 // lenis is driven by gsap's ticker so ScrollTrigger and smooth scroll share a frame
@@ -35,7 +35,7 @@ watch(lenis, (instance) => instance?.on("scroll", ScrollTrigger.update));
 useHead({
   htmlAttrs: { lang: "en" },
   titleTemplate: (title) =>
-    title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`,
+    title ? `${title} — ${site.brand}` : `${site.brand} — ${site.name}, ${site.role}`,
   script: [
     // before first paint: returning visitors in this session skip the loader
     {
@@ -45,16 +45,38 @@ useHead({
     },
   ],
   link: [
+    { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+    { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+    { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     { rel: "preload", href: "/fonts/anton-regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
     { rel: "preload", href: "/fonts/lato-regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
+    // the "kay" mark in the header
+    { rel: "preload", href: "/fonts/meaculpa-regular.woff2", as: "font", type: "font/woff2", crossorigin: "" },
   ],
+});
+
+// share previews and search engines need absolute urls on the live domain
+const route = useRoute();
+const shareImage = absoluteUrl("/og.png");
+
+useHead({
+  link: [{ rel: "canonical", href: () => absoluteUrl(route.path) }],
 });
 
 useSeoMeta({
   description: site.description,
+  ogTitle: `${site.brand} — ${site.name}, ${site.role}`,
+  ogDescription: site.description,
   ogType: "website",
-  ogSiteName: site.name,
+  ogSiteName: site.brand,
+  ogUrl: () => absoluteUrl(route.path),
+  ogImage: shareImage,
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
+  ogImageAlt: `${site.brand}: ${site.name}, ${site.role} in ${site.location}`,
   twitterCard: "summary_large_image",
+  twitterImage: shareImage,
+  twitterSite: "@thisKehinde",
 });
 
 // without a loader on screen, the first page can run its intro right away

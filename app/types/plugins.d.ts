@@ -2,9 +2,7 @@ import type { Ref } from "vue";
 
 interface Loader {
   isLoading: Ref<boolean>;
-  loaderFinished: Ref<boolean>;
   finishLoader: () => void;
-  resetLoader: () => void;
 }
 
 declare module "#app" {

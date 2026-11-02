@@ -6,7 +6,7 @@ const props = defineProps<{ error: NuxtError }>();
 
 const is404 = computed(() => props.error.statusCode === 404);
 
-useHead({ title: `${is404.value ? "not found" : "error"} — ${site.name}` });
+useHead({ title: `${is404.value ? "not found" : "error"} — ${site.brand}` });
 
 function goHome() {
   clearError({ redirect: "/" });
