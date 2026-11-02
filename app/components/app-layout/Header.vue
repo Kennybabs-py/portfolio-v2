@@ -7,7 +7,7 @@ import Clock from "../Clock.vue";
     <nav class="nav">
       <div class="nav-col">
         <div class="nav-items name">
-          <NuxtLink href="/">kehinde</NuxtLink>
+          <NuxtLink to="/">kehinde</NuxtLink>
         </div>
 
         <div class="nav-items">
@@ -17,8 +17,8 @@ import Clock from "../Clock.vue";
 
       <div class="nav-col">
         <div class="nav-items">
-          <NuxtLink href="/projects">projects</NuxtLink>
-          <!-- <NuxtLink href="/info">info</NuxtLink> -->
+          <NuxtLink to="/projects">projects</NuxtLink>
+          <!-- <NuxtLink to="/info">info</NuxtLink> -->
         </div>
 
         <!-- <div class="nav-items">
@@ -30,9 +30,9 @@ import Clock from "../Clock.vue";
           <span>lagos, ng</span>
         </div>
 
-        <div class="nav-items">
+        <!-- <div class="nav-items">
           <Clock />
-        </div>
+        </div> -->
       </div>
     </nav>
   </header>
@@ -43,19 +43,19 @@ import Clock from "../Clock.vue";
 
 header.header__wrapper {
   position: fixed;
-  width: 100vw;
+  width: 100%;
   top: 0;
   left: 0;
   z-index: 10;
   min-height: var(--header-height);
-  border: 2px solid green;
+  color: $color-white;
+  // blends against whatever page is underneath, including mid-transition
+  mix-blend-mode: difference;
 
   nav.nav {
     @include flex(flex-start, space-between, row);
     width: 100%;
     padding: 1rem;
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
   }
 
   .nav-col {
@@ -70,9 +70,13 @@ header.header__wrapper {
     flex-direction: column;
 
     & > * {
-      color: $color-white;
-      mix-blend-mode: difference;
+      color: inherit;
       font-weight: 200;
+    }
+
+    & > a {
+      @extend %link--hidden;
+      width: fit-content;
     }
 
     &.name {
@@ -80,8 +84,8 @@ header.header__wrapper {
     }
   }
 
-  .nav-col:nth-child(2) .nav-items:last-child p {
-    text-align: right;
+  .nav-col:nth-child(2) .nav-items:last-child {
+    align-items: flex-end;
   }
 }
 </style>

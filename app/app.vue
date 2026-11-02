@@ -1,26 +1,169 @@
 <script setup lang="ts">
-import { gsap, SplitText, ScrollTrigger } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import PageLoader from "./components/PageLoader.vue";
 import type { LenisOptions } from "lenis";
 
-const lenisOptions: LenisOptions = {};
+// lenis is driven by gsap's ticker so ScrollTrigger and smooth scroll share a frame
+const lenisOptions: LenisOptions = { autoRaf: false };
+const lenis = useLenis();
 
 const { finishLoader, isLoading } = useLoader();
+const pageReady = usePageReady();
+const transitioning = usePageTransitioning();
+const shadeRef = ref<HTMLElement | null>(null);
 
-function onLoaderComplete() {
-  finishLoader();
+const DURATION = 1.3;
+// how far into the transition the new page starts its intro
+const READY_AT = 0.75;
+
+function update(time: number) {
+  lenis.value?.raf(time * 1000);
 }
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+onMounted(() => {
+  gsap.ticker.add(update);
+  gsap.ticker.lagSmoothing(0);
+});
+
+onBeforeUnmount(() => gsap.ticker.remove(update));
+
+watch(lenis, (instance) => instance?.on("scroll", ScrollTrigger.update));
+
+// without a loader on screen, the first page can run its intro right away
+if (!isLoading.value) pageReady.value = true;
+
+const router = useRouter();
+
+router.beforeEach((to, from) => {
+  if (to.path === from.path) return;
+  // don't stack transitions or navigate under the loader
+  if (transitioning.value || isLoading.value) return false;
+});
+
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+const onLeave = (el: Element, done: () => void) => {
+  const page = el as HTMLElement;
+  const scrollY = window.scrollY;
+
+  transitioning.value = true;
+  pageReady.value = false;
+  lenis.value?.stop();
+
+  // pin the old page at its current scroll position and cut it off at the
+  // bottom of the viewport, so its bottom edge is on screen and can curve
+  gsap.set(page, {
+    position: "fixed",
+    top: -scrollY,
+    left: 0,
+    width: "100%",
+    height: scrollY + window.innerHeight,
+    minHeight: 0, // pages set min-height: 100svh+, which would beat height
+    overflow: "hidden",
+    zIndex: 5, // above the shade (4), below the header (10)
+  });
+
+  // the new page renders underneath from the top
+  window.scrollTo(0, 0);
+  lenis.value?.scrollTo(0, { immediate: true, force: true });
+
+  if (prefersReducedMotion()) {
+    gsap.to(page, { autoAlpha: 0, duration: 0.4, onComplete: done });
+    return;
+  }
+
+  gsap
+    .timeline({ onComplete: done })
+    .to(
+      page,
+      { y: -window.innerHeight, duration: DURATION, ease: "expo-in-out" },
+      0,
+    )
+    .fromTo(
+      page,
+      {
+        borderBottomLeftRadius: "50% 0vh",
+        borderBottomRightRadius: "50% 0vh",
+      },
+      {
+        borderBottomLeftRadius: "50% 22vh",
+        borderBottomRightRadius: "50% 22vh",
+        duration: DURATION * 0.6,
+        ease: "power2.in",
+      },
+      0,
+    )
+    .fromTo(
+      shadeRef.value,
+      { autoAlpha: 0.7 },
+      { autoAlpha: 0, duration: DURATION, ease: "expo-in-out" },
+      0,
+    );
+};
+
+const onEnter = (el: Element, done: () => void) => {
+  const finish = () => {
+    lenis.value?.start();
+    ScrollTrigger.refresh();
+    transitioning.value = false;
+    done();
+  };
+
+  if (prefersReducedMotion()) {
+    pageReady.value = true;
+    gsap.from(el, { autoAlpha: 0, duration: 0.4, onComplete: finish });
+    return;
+  }
+
+  gsap
+    .timeline({ onComplete: finish })
+    .fromTo(
+      el,
+      { y: "25vh" },
+      { y: 0, duration: DURATION, ease: "expo-in-out", clearProps: "transform" },
+      0,
+    )
+    .call(() => (pageReady.value = true), [], DURATION * READY_AT);
+};
+
+function onLoaderReveal() {
+  pageReady.value = true;
+}
 </script>
 
 <template>
-  <PageLoader v-if="isLoading" @complete="onLoaderComplete" />
+  <PageLoader
+    v-if="isLoading"
+    @reveal="onLoaderReveal"
+    @complete="finishLoader"
+  />
 
-  <PageTransition>
-    <NuxtLayout>
-      <VueLenis root :options="lenisOptions" />
-      <NuxtPage />
-    </NuxtLayout>
-  </PageTransition>
+  <VueLenis root :options="lenisOptions" />
+
+  <NuxtLayout>
+    <NuxtPage
+      :transition="{
+        name: 'page',
+        css: false,
+        onLeave,
+        onEnter,
+      }"
+    />
+  </NuxtLayout>
+
+  <!-- darkens the incoming page while the old one lifts off it -->
+  <div ref="shadeRef" class="page__shade" />
 </template>
+
+<style>
+.page__shade {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  background: #000;
+  pointer-events: none;
+  visibility: hidden;
+}
+</style>

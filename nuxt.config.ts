@@ -6,7 +6,11 @@ export default defineNuxtConfig({
   css: ["@/assets/css/main.scss"],
   modules: ["lenis/nuxt", "@nuxtjs/tailwindcss", "shadcn-nuxt"],
 
-  plugins: ["@/plugins/loader"],
+  vite: {
+    optimizeDeps: {
+      include: ["gsap", "gsap/CustomEase", "gsap/ScrollTrigger", "gsap/SplitText"],
+    },
+  },
 
   shadcn: {
     /**

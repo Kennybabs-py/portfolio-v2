@@ -1,7 +1,6 @@
 import gsap from "gsap";
-import SplitText from "gsap/dist/SplitText";
-import ScrollTrigger from "gsap/dist/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { CustomEase } from "gsap/CustomEase";
 
-// import { useGSAP } from "@gsap/react";
-
-export { gsap, SplitText, ScrollTrigger };
+export { gsap, SplitText, ScrollTrigger, CustomEase };
