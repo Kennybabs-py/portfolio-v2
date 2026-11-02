@@ -39,7 +39,7 @@ export const projects: Project[] = [
     summary:
       "live football markets: back home, draw or away, then sell any time or hold to the whistle. claude code worked as my junior engineer.",
     color: "#0c1222",
-    accent: "#d97706",
+    accent: "#af7430",
     image: "/projects/stadeo.jpg",
     url: "https://stadeo.app"
   },
@@ -65,7 +65,7 @@ export const projects: Project[] = [
     summary:
       "a pari-mutuel football pool on robinhood chain: stake $sach on a result, winners split the pot by stake, and every settlement is verifiable on-chain. claude code as my assistant.",
     color: "#141414",
-    accent: "#0f9d6b",
+    accent: "#2b8163",
     image: "/projects/sachet.jpg",
     url: "https://www.sachetpool.xyz"
   },
@@ -86,7 +86,7 @@ export const projects: Project[] = [
     summary:
       "ai study tools for students: flashcards generated from your notes, a 24/7 ai tutor, adaptive quizzes, and multiple explanations of the same answer.",
     color: "#0b2ad1",
-    accent: "#3d5afe",
+    accent: "#6475d7",
     image: "/projects/scholara.jpg",
     url: "https://scholara.ng"
   },
@@ -109,7 +109,7 @@ export const projects: Project[] = [
     summary:
       "a multi-chain nft marketplace with a launchpad, for creators and for users getting into the blockchain market. paused when the company behind it ran into funding issues.",
     color: "#8b5cf6",
-    accent: "#8b5cf6",
+    accent: "#977bd7",
   },
 ];
 
