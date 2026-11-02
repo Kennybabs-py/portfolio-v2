@@ -95,21 +95,25 @@ useSeoMeta({
     text-transform: uppercase;
   }
 
+  // editorial serif for the reading text, against the condensed headings
   .info--copy {
-    max-width: 24ch;
+    max-width: 22ch;
     margin-top: 3rem;
     margin-left: auto;
-    font-size: var(--step-3);
+    font-family: var(--font-serif);
+    font-size: calc(var(--step-3) * 1.2);
   }
 
   .info--statement {
-    line-height: 1.15;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
   }
 
   .info--aside {
     margin-top: 1.5rem;
-    font-size: var(--step-1);
-    line-height: 1.4;
+    font-size: calc(var(--step-1) * 1.25);
+    font-style: italic;
+    line-height: 1.3;
     color: $color-muted;
   }
 
