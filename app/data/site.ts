@@ -43,6 +43,8 @@ export const site = {
   info: {
     statement:
       "i'm kehinde, a software engineer in lagos, ng. i craft web applications and sites for individuals, studios, and companies, balancing thought and function, and sweating the motion in between.",
+    // a smaller aside under the statement
+    aside: "ohhh, and i use ai tools extremely well.",
   },
 
   footer: {

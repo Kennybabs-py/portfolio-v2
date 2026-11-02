@@ -11,7 +11,8 @@ usePageEnter(() => {
   gsap
     .timeline()
     .add(revealText(".info--title", "chars"), 0)
-    .add(revealText(".info--statement", "lines"), 0.3);
+    .add(revealText(".info--statement", "lines"), 0.3)
+    .add(revealText(".info--aside", "words"), 0.7);
 
   scrollReveals(containerRef.value);
 }, containerRef);
@@ -27,9 +28,14 @@ useSeoMeta({
     <header class="info__header">
       <h1 class="info--title" data-reveal>info</h1>
 
-      <p class="info--statement" data-reveal>
-        {{ site.info.statement }}
-      </p>
+      <div class="info--copy">
+        <p class="info--statement" data-reveal>
+          {{ site.info.statement }}
+        </p>
+        <p v-if="site.info.aside" class="info--aside" data-reveal>
+          {{ site.info.aside }}
+        </p>
+      </div>
     </header>
 
     <div id="tools" class="info__block">
@@ -89,12 +95,22 @@ useSeoMeta({
     text-transform: uppercase;
   }
 
-  .info--statement {
+  .info--copy {
     max-width: 24ch;
     margin-top: 3rem;
     margin-left: auto;
     font-size: var(--step-3);
+  }
+
+  .info--statement {
     line-height: 1.15;
+  }
+
+  .info--aside {
+    margin-top: 1.5rem;
+    font-size: var(--step-1);
+    line-height: 1.4;
+    color: $color-muted;
   }
 
   .info__block {
