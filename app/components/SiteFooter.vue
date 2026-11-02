@@ -25,7 +25,7 @@ function backToTop() {
 
       <ul v-if="contactLinks.length" class="socials">
         <li v-for="link in contactLinks" :key="link.href">
-          <SocialLink :platform="link.platform" :href="link.href" />
+          <SocialLink :platform="link.platform" :href="link.href" size="sm" />
         </li>
       </ul>
 
@@ -74,7 +74,7 @@ function backToTop() {
 
   .socials {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem;
     list-style: none;
   }
 

@@ -18,7 +18,10 @@ export const site = {
   email: "babalolakehinde74@gmail.com",
   socials: [
     { platform: "x", href: "https://x.com/thisKehinde" },
-    { platform: "linkedin", href: "https://www.linkedin.com/in/kehinde-babalola/" },
+    {
+      platform: "linkedin",
+      href: "https://www.linkedin.com/in/kehinde-babalola/",
+    },
   ] as ContactLink[],
 
   hero: {
@@ -80,6 +83,8 @@ export const site = {
 
 /** email first, then the socials; rendered as icon links */
 export const contactLinks: ContactLink[] = [
-  ...(site.email ? [{ platform: "email" as const, href: `mailto:${site.email}` }] : []),
+  ...(site.email
+    ? [{ platform: "email" as const, href: `mailto:${site.email}` }]
+    : []),
   ...site.socials,
 ];

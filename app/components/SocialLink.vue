@@ -2,10 +2,14 @@
 import type { Platform } from "@/data/site";
 
 // an icon-only link; the platform name is for screen readers and the tooltip
-const props = defineProps<{
-  platform: Platform;
-  href: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    platform: Platform;
+    href: string;
+    size?: "md" | "sm";
+  }>(),
+  { size: "md" },
+);
 
 const names: Record<Platform, string> = {
   email: "email",
@@ -19,6 +23,7 @@ const external = computed(() => props.platform !== "email");
 <template>
   <a
     class="social__link"
+    :class="`social__link--${size}`"
     :href="href"
     :aria-label="names[platform]"
     :title="names[platform]"
@@ -71,6 +76,17 @@ const external = computed(() => props.platform !== "email");
   svg {
     width: 1.1rem;
     height: 1.1rem;
+  }
+
+  // compact, for the footer row
+  &--sm {
+    width: 2rem;
+    height: 2rem;
+
+    svg {
+      width: 0.8rem;
+      height: 0.8rem;
+    }
   }
 
   &:hover,
