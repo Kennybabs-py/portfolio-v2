@@ -1,148 +1,216 @@
 <script lang="ts" setup>
-const length = ref(12);
-const secondCount = ref(1);
-const timerId = ref<number | null>();
+import { gsap } from "@/lib/gsap";
+import { prefersReducedMotion } from "@/lib/motion";
+import { site } from "@/data/site";
 
-const secondHandRef = useTemplateRef<HTMLDivElement>("secondHandRef");
-const hourHandRef = useTemplateRef<HTMLDivElement>("hourHandRef");
-const minuteHandRef = useTemplateRef<HTMLDivElement | null>("minuteHandRef");
+// lagos time, drawn as a small watch face with a sweeping second hand
+const hourRef = ref<SVGGElement | null>(null);
+const minuteRef = ref<SVGGElement | null>(null);
+const secondRef = ref<SVGGElement | null>(null);
 
-function startInterval() {
-  stopInterval();
+const hours = ref("--");
+const minutes = ref("--");
+const colonOn = ref(true);
 
-  timerId.value = setInterval(() => {
-    secondCount.value = secondCount.value === 60 ? 1 : secondCount.value + 1;
-  }, 1000);
-}
+const ticks = Array.from({ length: 12 }, (_, i) => ({
+  angle: i * 30,
+  major: i % 3 === 0,
+}));
 
-function stopInterval() {
-  if (!timerId.value) return;
-  clearInterval(timerId.value);
-  timerId.value = null;
-}
-
-onBeforeMount(() => {
-  startInterval();
+const formatter = new Intl.DateTimeFormat("en-GB", {
+  timeZone: site.timezone,
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23",
 });
 
-onBeforeUnmount(() => {
-  stopInterval();
-});
+// difference between the visitor's clock and lagos, so each frame can use
+// Date.now() instead of formatting a date 60 times a second
+let offsetMs = 0;
 
-watch(secondCount, () => {
+function measureOffset() {
   const now = new Date();
-  const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
-  const minutes = now.getMinutes() + seconds / 60;
-  const hours = (now.getHours() % 12) + minutes / 60;
+  const [h, m, s] = formatter.format(now).split(":").map(Number) as [
+    number,
+    number,
+    number,
+  ];
+  const lagosMs = ((h * 60 + m) * 60 + s) * 1000 + now.getMilliseconds();
+  const localMs =
+    ((now.getHours() * 60 + now.getMinutes()) * 60 + now.getSeconds()) * 1000 +
+    now.getMilliseconds();
+  offsetMs = lagosMs - localMs;
+}
 
-  const secondDeg = (seconds / 60) * 360;
-  const minuteDeg = (minutes / 60) * 360;
-  const hourDeg = (hours / 12) * 360;
+function draw(smooth: boolean) {
+  const now = new Date(Date.now() + offsetMs);
+  const ms = now.getMilliseconds();
+  const s = now.getSeconds() + (smooth ? ms / 1000 : 0);
+  const m = now.getMinutes() + s / 60;
+  const h = (now.getHours() % 12) + m / 60;
 
-  if (secondHandRef.value) {
-    secondHandRef.value.style.transform = `rotate(${secondDeg}deg)`;
-  }
-  if (minuteHandRef.value) {
-    minuteHandRef.value.style.transform = `rotate(${minuteDeg}deg)`;
+  hourRef.value?.setAttribute("transform", `rotate(${h * 30})`);
+  minuteRef.value?.setAttribute("transform", `rotate(${m * 6})`);
+  secondRef.value?.setAttribute("transform", `rotate(${s * 6})`);
+
+  hours.value = String(now.getHours()).padStart(2, "0");
+  minutes.value = String(now.getMinutes()).padStart(2, "0");
+  colonOn.value = ms < 500;
+}
+
+let cleanup: (() => void) | undefined;
+
+onMounted(() => {
+  measureOffset();
+  const smooth = !prefersReducedMotion();
+
+  if (smooth) {
+    const tick = () => draw(true);
+    gsap.ticker.add(tick);
+    cleanup = () => gsap.ticker.remove(tick);
+  } else {
+    draw(false);
+    const id = setInterval(() => draw(false), 1000);
+    cleanup = () => clearInterval(id);
   }
 
-  if (hourHandRef.value) {
-    hourHandRef.value.style.transform = `rotate(${hourDeg}deg)`;
-  }
+  // re-sync now and then, in case the visitor's clock or timezone shifts
+  const resync = setInterval(measureOffset, 60_000);
+  const stop = cleanup;
+  cleanup = () => {
+    stop?.();
+    clearInterval(resync);
+  };
 });
+
+onBeforeUnmount(() => cleanup?.());
 </script>
 
 <template>
-  <div class="round--clock--wrapper">
-    <div class="round--clock" :style="{ '--radius': 40, '--length': length }">
-      <div class="dot" />
-      <div class="hand second-hand" ref="secondHandRef" />
+  <div
+    class="clock"
+    role="img"
+    :aria-label="`local time in lagos ${hours}:${minutes}`"
+  >
+    <svg class="clock__face" viewBox="-50 -50 100 100" aria-hidden="true">
+      <circle class="clock__rim" r="46" />
 
-      <div class="hand hour-hand" ref="hourHandRef" />
-
-      <div class="hand minute-hand" ref="minuteHandRef" />
-
-      <span
-        v-for="value in 10"
-        :key="value"
-        :style="{ '--index': value + 1 }"
-        class="minute--mark"
+      <line
+        v-for="tick in ticks"
+        :key="tick.angle"
+        class="clock__tick"
+        :class="{ 'is-major': tick.major }"
+        :transform="`rotate(${tick.angle})`"
+        x1="0"
+        y1="-40"
+        x2="0"
+        :y2="tick.major ? -30 : -36"
       />
-    </div>
+
+      <g ref="hourRef" class="clock__hand clock__hand--hour">
+        <line x1="0" y1="6" x2="0" y2="-20" />
+      </g>
+      <g ref="minuteRef" class="clock__hand clock__hand--minute">
+        <line x1="0" y1="8" x2="0" y2="-32" />
+      </g>
+      <g ref="secondRef" class="clock__hand clock__hand--second">
+        <line x1="0" y1="12" x2="0" y2="-38" />
+        <circle cy="-26" r="3" />
+      </g>
+
+      <circle class="clock__cap" r="4" />
+    </svg>
+
+    <span class="clock__time">
+      {{ hours }}<span class="clock__colon" :class="{ 'is-off': !colonOn }">:</span>{{ minutes }}
+      <span class="clock__zone">wat</span>
+    </span>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.round--clock--wrapper {
-  position: relative;
+@use "@/assets/css/index" as *;
+
+.clock {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  width: fit-content;
-  padding: 5px;
-  border: 1px solid transparent;
+  gap: 0.6rem;
 
-  .round--clock {
-    position: relative;
-    width: calc(var(--radius) * 1px);
-    aspect-ratio: 1/1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #fff;
-    border-radius: 50%;
+  .clock__face {
+    width: 2rem;
+    height: 2rem;
+    overflow: visible;
   }
 
-  .dot {
-    position: absolute;
-    width: calc(var(--radius) * 0.04 * 1px);
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    background-color: #fff;
+  .clock__rim {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
   }
 
-  .minute--mark {
-    --height: calc(var(--radius) / 20);
-    --rotation: calc((var(--index) / var(--length)) * 360);
-    --position: calc((var(--radius) - var(--height)) / -2 * 1px);
+  .clock__tick {
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    opacity: 0.45;
 
-    display: inline-block;
-    position: absolute;
-    width: 2px;
-    height: calc(var(--height) * 1px);
-    background-color: #fff;
-    transform: rotate(calc(var(--rotation) * 1deg)) translateY(var(--position));
+    &.is-major {
+      stroke-width: 4;
+      opacity: 1;
+    }
   }
 
-  .hand {
-    position: absolute;
-    bottom: 50%;
-    left: 50%;
-    transform-origin: 50% 100%;
-    transform: rotate(0deg);
-    background-color: #fff;
-    border-radius: 2px;
+  .clock__hand line {
+    stroke: currentColor;
+    stroke-linecap: round;
   }
 
-  .hour-hand {
-    width: 1.4px;
-    height: calc((var(--radius) / 2.5) * 1px);
-    background-color: #fff;
-    z-index: 3;
+  .clock__hand--hour line {
+    stroke-width: 7;
   }
 
-  .minute-hand {
-    width: 1px;
-    height: calc((var(--radius) / 2.1) * 1px);
-    background-color: #fff;
-    z-index: 4;
+  .clock__hand--minute line {
+    stroke-width: 4.5;
   }
 
-  .second-hand {
-    width: 1px;
-    height: calc((var(--radius) / 2.2) * 1px);
-    background-color: red;
-    z-index: 5;
+  // inverse of the accent: the header's difference blend turns it back into
+  // the accent over light pages (and cyan over dark ones)
+  .clock__hand--second {
+    line {
+      stroke: #00b1e0;
+      stroke-width: 2;
+    }
+
+    circle {
+      fill: #00b1e0;
+    }
+  }
+
+  .clock__cap {
+    fill: currentColor;
+  }
+
+  .clock__time {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .clock__colon {
+    transition: opacity 0.2s;
+
+    &.is-off {
+      opacity: 0.25;
+    }
+  }
+
+  .clock__zone {
+    margin-left: 0.15rem;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.55;
   }
 }
 </style>

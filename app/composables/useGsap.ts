@@ -1,15 +1,55 @@
-// composables/useGSAP.ts
-import { onMounted, onUnmounted, type Ref } from "vue";
+import { onMounted, onUnmounted, watch, type Ref } from "vue";
 import { gsap } from "@/lib/gsap";
 
-export function useGSAP(callback: () => void, scope?: Ref<HTMLElement | null>) {
-  let context: gsap.Context;
+/** true once the current page is visible (loader gone / transition far enough in) */
+export function usePageReady() {
+  return useState("page-ready", () => false);
+}
+
+/** true while a route transition is running */
+export function usePageTransitioning() {
+  return useState("page-transitioning", () => false);
+}
+
+// a leaving page unmounts before its exit animation ends,
+// so wait for the transition to finish before reverting its animations
+function deferRevert(context: gsap.Context) {
+  const nuxtApp = useNuxtApp();
+  const transitioning = usePageTransitioning();
+
+  return () => {
+    if (transitioning.value) {
+      nuxtApp.hooks.hookOnce("page:transition:finish", () => context.revert());
+    } else {
+      context.revert();
+    }
+  };
+}
+
+/** runs a page's GSAP intro inside a context once the page is ready */
+export function usePageEnter(
+  // may return a cleanup function, called when the page's context reverts
+  callback: () => void | (() => void),
+  scope?: Ref<HTMLElement | null>,
+) {
+  const ready = usePageReady();
+  let revert: (() => void) | undefined;
+  let stop: (() => void) | undefined;
 
   onMounted(() => {
-    context = gsap.context(callback, scope?.value || undefined);
+    stop = watch(
+      ready,
+      (isReady) => {
+        if (!isReady || revert) return;
+        revert = deferRevert(gsap.context(callback, scope?.value || undefined));
+        queueMicrotask(() => stop?.());
+      },
+      { immediate: true },
+    );
   });
 
   onUnmounted(() => {
-    if (context) context.revert();
+    stop?.();
+    revert?.();
   });
 }
