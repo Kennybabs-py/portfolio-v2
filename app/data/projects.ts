@@ -109,7 +109,7 @@ export const projects: Project[] = [
     summary:
       "a multi-chain nft marketplace with a launchpad, for creators and for users getting into the blockchain market. paused when the company behind it ran into funding issues.",
     color: "#8b5cf6",
-    accent: "#977bd7",
+    accent: "#8a6dcc",
   },
 ];
 
