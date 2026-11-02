@@ -1,13 +1,17 @@
 <script lang="ts" setup>
 import Clock from "../Clock.vue";
+import HeaderBall from "./HeaderBall.vue";
 import { site } from "@/data/site";
+
+const nameRef = ref<HTMLElement | null>(null);
+const nameLink = computed(() => nameRef.value?.querySelector("a") ?? null);
 </script>
 
 <template>
   <header class="header__wrapper">
     <nav class="nav" aria-label="main">
       <div class="nav-col">
-        <div class="nav-items name">
+        <div ref="nameRef" class="nav-items name">
           <NuxtLink to="/">{{ site.name }}</NuxtLink>
         </div>
 
@@ -28,6 +32,8 @@ import { site } from "@/data/site";
         </div>
       </div>
     </nav>
+
+    <HeaderBall :anchor="nameLink" />
   </header>
 </template>
 
