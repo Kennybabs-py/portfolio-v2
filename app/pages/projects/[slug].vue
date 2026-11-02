@@ -69,7 +69,9 @@ useSeoMeta({
 <template>
   <article ref="containerRef" class="case__wrapper">
     <header class="case__header">
-      <h1 class="case--title" data-reveal>{{ project.title }}</h1>
+      <h1 class="case--title" :style="{ color: project.accent }" data-reveal>
+        {{ project.title }}
+      </h1>
 
       <dl class="case--meta" data-reveal>
         <div>
@@ -118,7 +120,13 @@ useSeoMeta({
       data-cursor="next"
     >
       <span class="label" data-scroll-reveal="words">next project</span>
-      <span class="title" data-scroll-reveal="chars">{{ next.title }}</span>
+      <span
+        class="title"
+        :style="{ color: next.accent }"
+        data-scroll-reveal="chars"
+      >
+        {{ next.title }}
+      </span>
     </NuxtLink>
 
     <SiteFooter />
@@ -234,11 +242,12 @@ useSeoMeta({
       font-size: var(--step-5);
       line-height: 1;
       text-transform: uppercase;
-      transition: color 0.4s;
+      transition: opacity 0.4s;
     }
 
+    // the title carries the project's own colour, so hover dims it instead
     &:hover .title {
-      color: $color-accent;
+      opacity: 0.7;
     }
   }
 }

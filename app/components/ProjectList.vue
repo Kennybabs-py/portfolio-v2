@@ -79,7 +79,13 @@ function onLeave() {
             <span v-else>{{ project.title }}</span>
           </span>
           <span class="index">{{ String(index + 1).padStart(2, "0") }}</span>
-          <span class="title" data-scroll-reveal="chars">{{ project.title }}</span>
+          <span
+            class="title"
+            :style="{ color: project.accent }"
+            data-scroll-reveal="chars"
+          >
+            {{ project.title }}
+          </span>
           <span class="role">{{ project.role }}</span>
           <span class="year">{{ project.year ?? "" }}</span>
         </NuxtLink>
