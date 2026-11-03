@@ -1,5 +1,5 @@
 // all site copy lives here, so text changes never touch page code
-export type Platform = "email" | "x" | "linkedin";
+export type Platform = "email" | "x" | "linkedin" | "github";
 
 export interface ContactLink {
   platform: Platform;
@@ -25,6 +25,7 @@ export const site = {
       platform: "linkedin",
       href: "https://www.linkedin.com/in/kehinde-babalola/",
     },
+    { platform: "github", href: "https://github.com/Kennybabs-py" },
   ] as ContactLink[],
 
   hero: {
