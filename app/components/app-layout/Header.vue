@@ -1,13 +1,37 @@
 <script lang="ts" setup>
+import { gsap } from "@/lib/gsap";
 import Clock from "../Clock.vue";
 import HeaderBall from "./HeaderBall.vue";
 import { site } from "@/data/site";
 
 const nameRef = ref<HTMLElement | null>(null);
 const nameLink = computed(() => nameRef.value?.querySelector("a") ?? null);
+
+// the backdrop takes on the background of whichever page sits under the header
+// (dark pages, the light projects page, or the page lifting away mid-transition)
+const backdropRef = ref<HTMLElement | null>(null);
+let lastSample = 0;
+
+function sampleTint(time: number) {
+  if (time - lastSample < 0.1 || !backdropRef.value) return;
+  lastSample = time;
+
+  const y = backdropRef.value.offsetHeight + 1;
+  const page = document.elementFromPoint(innerWidth / 2, y)?.closest("main > *");
+  if (!page) return;
+
+  backdropRef.value.style.setProperty("--tint", getComputedStyle(page).backgroundColor);
+}
+
+onMounted(() => gsap.ticker.add(sampleTint));
+onBeforeUnmount(() => gsap.ticker.remove(sampleTint));
 </script>
 
 <template>
+  <!-- blurs whatever scrolls under the header; kept outside it so the header's
+       blend mode still works against the page -->
+  <div ref="backdropRef" class="header__backdrop" aria-hidden="true" />
+
   <header class="header__wrapper">
     <nav class="nav" aria-label="main">
       <div class="nav-col">
@@ -40,6 +64,27 @@ const nameLink = computed(() => nameRef.value?.querySelector("a") ?? null);
 
 <style lang="scss" scoped>
 @use "~/assets/css/index" as *;
+
+.header__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9; // above pages and the transition shade, below the header
+  width: 100%;
+  height: calc(var(--header-height) + 1.5rem);
+  pointer-events: none;
+  // a wash of the page colour over the blur, so what's underneath doesn't show
+  background-color: color-mix(in srgb, var(--tint, #{$color-ink}) 90%, transparent);
+  transition: background-color 0.4s;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  // full blur behind the header, easing out below it instead of a hard edge
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 1.5rem),
+    transparent
+  );
+}
 
 header.header__wrapper {
   position: fixed;
