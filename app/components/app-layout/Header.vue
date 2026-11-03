@@ -39,15 +39,16 @@ onBeforeUnmount(() => gsap.ticker.remove(sampleTint));
           <NuxtLink to="/" :aria-label="`${site.name}, home`">{{ site.brand }}</NuxtLink>
         </div>
 
-        <div class="nav-items hide-sm">
-          <span>{{ site.tagline }}</span>
+        <div class="nav-items links">
+          <NuxtLink to="/info">info</NuxtLink>
+          <!-- a section of the info page, so it never takes the active underline -->
+          <NuxtLink to="/info#tools" class="section-link">tools</NuxtLink>
         </div>
       </div>
 
       <div class="nav-col">
         <div class="nav-items links">
           <NuxtLink to="/projects">projects</NuxtLink>
-          <NuxtLink to="/info">info</NuxtLink>
         </div>
 
         <div class="nav-items location">
@@ -128,7 +129,7 @@ header.header__wrapper {
       width: fit-content;
     }
 
-    &:not(.name) > a.router-link-active::after {
+    &:not(.name) > a.router-link-active:not(.section-link)::after {
       transform: scaleX(1);
       transform-origin: left center;
     }
@@ -152,6 +153,13 @@ header.header__wrapper {
     }
   }
 
+  // links sit side by side, never stacked
+  .nav-items.links {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
   .nav-items.location {
     align-items: flex-end;
   }
@@ -161,12 +169,6 @@ header.header__wrapper {
 
     .hide-sm {
       display: none;
-    }
-
-    // links side by side, so they read as navigation, not a list
-    .nav-items.links {
-      flex-direction: row;
-      gap: 1rem;
     }
 
     .nav-col:first-child {

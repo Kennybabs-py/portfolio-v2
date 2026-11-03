@@ -13,7 +13,6 @@ export const site = {
   // the live address: canonical links, share previews and the sitemap
   url: "https://kennybabs.xyz",
   role: "software engineer",
-  tagline: "dev. studio",
   location: "lagos, ng",
   timezone: "Africa/Lagos",
   description:
@@ -60,12 +59,13 @@ export const site = {
     groups: [
       {
         label: "ai",
-        items: ["claude code", "codex", "gemini", "aws bedrock"],
+        items: ["claude code", "codex", "gemini", "aws bedrock", "vercel/eve"],
       },
       {
         label: "stack",
         items: [
           "javascript",
+          "react.js",
           "typescript",
           "python",
           "next.js",
@@ -74,6 +74,8 @@ export const site = {
           "gsap",
           "lenis",
           "scss",
+          "git/github",
+          "vite/vitest",
           "prisma",
           "postgresql",
           "supabase",
