@@ -1,14 +1,12 @@
 export interface Project {
   slug: string;
   title: string;
-  /** shown in the list and case study only when set */
-  year?: string;
-  role: string;
+  year: string;
   stack: string[];
   summary: string;
-  /** cover colour, shown behind the image while it loads (or instead of one) */
+  /** shown behind the image while it loads */
   color: string;
-  /** title colour; keep it at 3:1+ contrast on both paper and ink */
+  /** title colour on hover; keep it at 3:1+ contrast on both light and dark */
   accent: string;
   /** path under public/, e.g. "/projects/my-site.jpg"; served via <NuxtImg> */
   image?: string;
@@ -21,7 +19,6 @@ export const projects: Project[] = [
     slug: "stadeo",
     title: "stadeo",
     year: "2026",
-    role: "full-stack engineering",
     stack: [
       "next.js",
       "typescript",
@@ -41,13 +38,12 @@ export const projects: Project[] = [
     color: "#0c1222",
     accent: "#af7430",
     image: "/projects/stadeo.jpg",
-    url: "https://stadeo.app"
+    url: "https://stadeo.app",
   },
   {
     slug: "sachet-pool",
     title: "sachet pool",
     year: "2026",
-    role: "full-stack engineering",
     stack: [
       "next.js",
       "typescript",
@@ -67,13 +63,12 @@ export const projects: Project[] = [
     color: "#141414",
     accent: "#2b8163",
     image: "/projects/sachet.jpg",
-    url: "https://www.sachetpool.xyz"
+    url: "https://www.sachetpool.xyz",
   },
   {
     slug: "scholara",
     title: "scholara",
     year: "2024",
-    role: "full-stack engineering",
     stack: [
       "react",
       "vite",
@@ -88,13 +83,12 @@ export const projects: Project[] = [
     color: "#0b2ad1",
     accent: "#6475d7",
     image: "/projects/scholara.jpg",
-    url: "https://scholara.ng"
+    url: "https://scholara.ng",
   },
   {
     slug: "fractal-visions",
     title: "fractal visions",
     year: "2023",
-    role: "full-stack engineering",
     stack: [
       "next.js",
       "typescript",
@@ -107,18 +101,8 @@ export const projects: Project[] = [
       "vercel",
     ],
     summary:
-      "a multi-chain nft marketplace with a launchpad, for creators and for users getting into the blockchain market. paused when the company behind it ran into funding issues.",
+      "a multi-chain nft marketplace with a launchpad, for creators and for users getting into the blockchain market.",
     color: "#8b5cf6",
     accent: "#8a6dcc",
   },
 ];
-
-export function findProject(slug: string) {
-  const index = projects.findIndex((project) => project.slug === slug);
-  if (index === -1) return null;
-
-  return {
-    project: projects[index]!,
-    next: projects[(index + 1) % projects.length]!,
-  };
-}
