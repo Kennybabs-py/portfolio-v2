@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["@/assets/css/main.scss"],
-  modules: ["lenis/nuxt", "@nuxt/image"],
+  modules: ["@nuxt/image"],
 
   // project images go in public/projects/, served as modern formats at the
   // sizes each <NuxtImg> asks for
@@ -13,9 +13,10 @@ export default defineNuxtConfig({
     quality: 80,
   },
 
-  vite: {
-    optimizeDeps: {
-      include: ["gsap", "gsap/CustomEase", "gsap/ScrollTrigger", "gsap/SplitText"],
-    },
+  // the site is one page now; old links land on the matching section
+  routeRules: {
+    "/info": { redirect: "/#about" },
+    "/projects": { redirect: "/#work" },
+    "/projects/**": { redirect: "/#work" },
   },
 });

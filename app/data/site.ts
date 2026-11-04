@@ -28,33 +28,22 @@ export const site = {
     { platform: "github", href: "https://github.com/Kennybabs-py" },
   ] as ContactLink[],
 
-  hero: {
-    greeting: "hi, i'm kehinde.",
-    motto: "build, iterate, build, repeat",
-    // each entry is one line of the headline
-    headline: ["a software", "engineer"],
-    // segments with `to` render as links
-    intro: [
-      { text: "who resides in lagos, ng. i use " },
-      { text: "tools", to: "/info#tools" },
-      {
-        text: " to craft web applications and sites for individuals, studios, and companies. i enjoy playing snooker, fifa and taking long walks in order to meet my luck.",
-      },
-    ] as { text: string; to?: string }[],
-    closing: "the subtle art of balancing thoughts and function",
+  about: {
+    // set large, at the top of the page
+    lede: "i'm kehinde, a software engineer in lagos, ng. i build web applications and sites for individuals, studios and companies.",
+    paragraphs: [
+      "i work ai-native: claude code and codex are part of how i plan, write and ship software, and i stay accountable for every line that goes out. everything below i built end to end, from the database to the interface.",
+      "away from the keyboard you'll find me playing snooker, fifa, or taking long walks in order to meet my luck.",
+    ],
   },
 
-  info: {
-    statement:
-      "i'm kehinde, a software engineer in lagos, ng. i craft web applications and sites for individuals, studios, and companies, balancing thought and function, and sweating the motion in between.",
-    // a smaller aside under the statement
-    aside: "ohhh, and i use ai tools extremely well.",
-  },
-
-  footer: {
-    eyebrow: "got an idea worth building?",
+  contact: {
+    prompt: "got an idea worth building?",
     cta: "let's talk",
   },
+
+  // the last line of the page
+  closing: "the subtle art of balancing thought and function.",
 
   tools: {
     groups: [

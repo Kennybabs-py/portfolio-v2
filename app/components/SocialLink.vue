@@ -2,14 +2,10 @@
 import type { Platform } from "@/data/site";
 
 // an icon-only link; the platform name is for screen readers and the tooltip
-const props = withDefaults(
-  defineProps<{
-    platform: Platform;
-    href: string;
-    size?: "md" | "sm";
-  }>(),
-  { size: "md" },
-);
+const props = defineProps<{
+  platform: Platform;
+  href: string;
+}>();
 
 const names: Record<Platform, string> = {
   email: "email",
@@ -24,13 +20,11 @@ const external = computed(() => props.platform !== "email");
 <template>
   <a
     class="social__link"
-    :class="`social__link--${size}`"
     :href="href"
     :aria-label="names[platform]"
     :title="names[platform]"
     :target="external ? '_blank' : undefined"
     :rel="external ? 'noopener' : undefined"
-    data-magnetic
   >
     <svg v-if="platform === 'x'" viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -66,42 +60,24 @@ const external = computed(() => props.platform !== "email");
 </template>
 
 <style lang="scss" scoped>
-@use "@/assets/css/index" as *;
-
 .social__link {
   display: inline-grid;
   place-items: center;
-  width: 3rem;
-  height: 3rem;
-  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--rule);
   border-radius: 50%;
-  color: inherit;
-  transition:
-    background-color 0.4s $ease-out-expo,
-    color 0.4s $ease-out-expo,
-    border-color 0.4s;
+  color: var(--muted);
 
   svg {
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-
-  // compact, for the footer row
-  &--sm {
-    width: 2rem;
-    height: 2rem;
-
-    svg {
-      width: 0.8rem;
-      height: 0.8rem;
-    }
+    width: 1rem;
+    height: 1rem;
   }
 
   &:hover,
   &:focus-visible {
-    background-color: $color-accent;
-    border-color: $color-accent;
-    color: $color-ink;
+    border-color: var(--accent);
+    color: var(--accent);
   }
 }
 </style>
